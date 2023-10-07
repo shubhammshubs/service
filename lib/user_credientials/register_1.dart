@@ -1,16 +1,89 @@
-import 'package:flutter/material.dart';
-import 'package:service/user_credientials/loginpage.dart';
+import 'dart:convert';
+// import 'dart:js';
 
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:service/user_credientials/loginpage.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Screens/Home_screen.dart';
 import 'info_form.dart';
 
 
 class RegistrationPage extends StatelessWidget {
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+
+  Future<void> _signUp(BuildContext context) async {
+
+
+    final String apiUrl =
+        'https://apip.trifrnd.com/Services/eng/sereng.php?apicall=signup';
+
+    // Simulate a delay of 1 second
+    await Future.delayed(Duration(seconds: 1));
+
+    final response = await http.post(Uri.parse(apiUrl),
+        body: {
+      "username": _nameController.text,
+          "email": _emailController.text,
+          "mobile": _mobileController.text,
+          "password": _passwordController.text,
+        });
+
+
+
+    if (response.statusCode == 200) {
+      final responseData = json.decode(response.body);
+      print("Response body: ${response.body}");
+
+      print("Decoded data: $responseData");
+
+      if (responseData == "User registered successfully") {
+        // Login successful, you can navigate to the next screen
+        print("Register successful");
+        final user = json.decode(response.body)[0];
+
+        Fluttertoast.showToast(
+          msg: response.body,
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        // Use Navigator to push HomePage onto the stack
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) =>  HomePage(
+            mobileNumber: _mobileController.text,
+          ),),
+        );
+
+      } else {
+        // Login failed, show an error message
+        print("Login failed");
+        Fluttertoast.showToast(
+          msg: "You Are Already Registered, Please Login to Continue",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
+    } else {
+      // Handle error if the API call was not successful
+      print("API call failed");
+      Fluttertoast.showToast(
+        msg: "Server Connction Error!",
+        toastLength: Toast.LENGTH_SHORT,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +119,7 @@ class RegistrationPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: TextFormField(
                         keyboardType: TextInputType.name,
+                        controller: _nameController,
                         decoration: const InputDecoration(
                           labelText: 'Name',
                           hintText: 'Enter Name',
@@ -70,6 +144,7 @@ class RegistrationPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: TextFormField(
                         keyboardType: TextInputType.emailAddress,
+                        controller: _emailController,
                         decoration: const InputDecoration(
                           labelText: 'Email',
                           hintText: 'Enter Email',
@@ -97,6 +172,7 @@ class RegistrationPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 15),
                       child: TextFormField(
                         keyboardType: TextInputType.phone,
+                        controller: _mobileController,
                         decoration: const InputDecoration(
                           labelText: 'Mobile',
                           hintText: 'Enter Mobile Number',
@@ -124,9 +200,10 @@ class RegistrationPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 15),
                       child: TextFormField(
                         keyboardType: TextInputType.visiblePassword,
+                        controller: _passwordController,
                         decoration: const InputDecoration(
                           labelText: 'Password',
-                          hintText: 'Enter Password',
+                          hintText: 'Enter Password ',
                           prefixIcon: Icon(Icons.password),
                           border: OutlineInputBorder(),
                         ),
@@ -151,25 +228,14 @@ class RegistrationPage extends StatelessWidget {
                       padding: EdgeInsets.symmetric(horizontal: 35),
                       child: MaterialButton(
                         minWidth: double.infinity,
-                        onPressed:() {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (context) => HomePage(mobileNumber: '',),),
-                          );
+                        onPressed: () async {
+                          // Handle login logic here
                           if (_formKey.currentState!.validate()) {
-                            // // Perform registration logic here
-                            // String name = _nameController.text;
-                            // String email = _emailController.text;
-                            // String mobile = _mobileController.text;
-                            // String password = _passwordController.text;
-                            //
-                            // // You can handle the form data here
-                            // print('Name: $name');
-                            // print('Email: $email');
-                            // print('Mobile: $mobile');
-                            // print('Password: $password');
+
+                            // Perform the login
+                            await _signUp(context);
 
                           }
-
                         },
                         color: Colors.teal,
                         textColor: Colors.white,

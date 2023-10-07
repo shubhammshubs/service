@@ -5,46 +5,19 @@ import 'package:service/user_credientials/info_form.dart';
 import 'package:service/user_credientials/info_form_2_register.dart';
 import 'package:service/user_credientials/loginpage.dart';
 import 'package:service/user_credientials/user_documents_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Screens/Home_screen.dart';
+import '../draftTest.dart';
 
 class NavBar extends StatelessWidget {
-  
-  const NavBar({super.key});
+  final String mobileNumber;
+  NavBar({required this.mobileNumber});
+  // const NavBar({super.key});
 
   @override
   Widget build(BuildContext context) {
     return
-      // Drawer(
-      // child: ListView(
-      //   padding: EdgeInsets.zero,
-      //   children: [
-      //
-      //     UserAccountsDrawerHeader(accountName: const Text('Hello'),
-      //       accountEmail: const Text("user@gmail.com"),
-      //       currentAccountPicture:
-      //
-      //       CircleAvatar(
-      //
-      //         child: ClipOval(
-      //           child: Image.asset(
-      //             'assets/image/splash.png',
-      //             width: 90,
-      //             height: 90,
-      //
-      //             fit: BoxFit.cover,
-      //           ),
-      //         ),
-      //       ),
-      //       decoration: const BoxDecoration(
-      //           color: Colors.teal,
-      //           image: DecorationImage(
-      //             image: AssetImage('assets/image/img.png',
-      //             ),
-      //             fit: BoxFit.cover,
-      //           )
-      //       ),
-      //     ),
       Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -63,13 +36,58 @@ class NavBar extends StatelessWidget {
                   ),
 
                   // Account picture
-                  const Positioned(
-                    top: 77.0, // Adjust the top position as needed
+                   Positioned(
+                    top: 79.0, // Adjust the top position as needed
                     left: 8.0, // Adjust the left position as needed
-                    child: CircleAvatar(
-                      radius: 44, // Adjust the size of the image as needed
-                      backgroundImage: AssetImage('assets/image/splash.png'),
+
+                    child: GestureDetector(
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              backgroundColor: Colors.transparent, // Set background color to transparent
+                              child: Stack(
+                                children: [
+                                  Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+
+                                      Image.asset(
+                                        'assets/image/splash.png', // Replace with the path to your image
+                                        width: 200, // Adjust the size of the enlarged image
+                                        height: 200,
+
+                                      ),
+                                      // Text('User Profile Picture'),
+                                    ],
+                                  ),
+                                  Positioned(
+                                    // top: 1.0,
+                                    bottom: 170,// Adjust the top position of the close button
+                                    right: 50.0, // Adjust the right position of the close button
+                                    child: IconButton(
+                                      icon: Icon(Icons.close,
+                                      color: Colors.white,),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // Close the dialog
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      },
+
+
+                      child: const CircleAvatar(
+                        radius: 45, // Adjust the size of the image as needed
+                        backgroundImage: AssetImage('assets/image/splash.png'),
+                      ),
                     ),
+
                   ),
                   // Account name and email
                   const Positioned(
@@ -104,7 +122,7 @@ class NavBar extends StatelessWidget {
             title: const Text('Dashboard'),
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => HomePage(mobileNumber: '',),)
+                  MaterialPageRoute(builder: (context) => HomePage(mobileNumber: mobileNumber,),)
               );
             }
           ),
@@ -118,10 +136,21 @@ class NavBar extends StatelessWidget {
             children: <Widget>[
               ListTile(
                 leading: const Icon(Icons.arrow_right),
+                title: const Text('StepperExample'),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => strip(mobileNumber: mobileNumber,),),
+                  );
+                  // Handle Information sub-menu item click
+                  // Navigator.of(context).pop(); // Close the drawer if needed
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.arrow_right),
                 title: const Text('Information'),
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => userInfoPage(),),
+                    MaterialPageRoute(builder: (context) => UserInfoPage(mobileNumber: mobileNumber,),),
                   );
                   // Handle Information sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
@@ -132,7 +161,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('Registration'),
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => registerInfoPage(),),
+                    MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: mobileNumber,),),
                   );
                   // Handle Registration sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
@@ -143,7 +172,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('Documents'),
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => DocumentUploadPage(),),
+                    MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: mobileNumber,),),
                   );
                   // Handle Documents sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
@@ -223,11 +252,14 @@ class NavBar extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text("Log Out"),
-            onTap: () {
+            onTap: () async {
 
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
+              final SharedPreferences sharedPreferences =
+                  await SharedPreferences.getInstance();
+              await sharedPreferences.remove('mobile');
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
+              // key.currentState!.reset(
+              // );
             },
           )
         ],

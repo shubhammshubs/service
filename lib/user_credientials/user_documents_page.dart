@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:service/user_credientials/loginpage.dart';
 
 class DocumentUploadPage extends StatefulWidget {
+  final String mobileNumber;
+  const DocumentUploadPage({super.key, required this.mobileNumber});
+
   @override
   _DocumentUploadPageState createState() => _DocumentUploadPageState();
 }
@@ -12,9 +15,10 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
   String? panCardPath;
   String? aadharCardPath;
   String? lightBillPath;
-  String? certificatePath;
+  // String? certificatePath;
   String? bankProofPath;
   String? educationCertificatePath;
+  String? profilePhotoPath;
 
   // Track whether all required documents are selected
   // bool _isFormValid = false;
@@ -31,7 +35,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
 
   // Function to check authentication for starred fields
   bool _areStarredFieldsAuthenticated() {
-    return panCardPath != null && aadharCardPath != null && bankProofPath != null;
+    return panCardPath != null && aadharCardPath != null && bankProofPath != null && profilePhotoPath != null;
   }
 
   Future<void> _selectDocument(String documentType) async {
@@ -45,9 +49,13 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         setState(() {
           if (documentType == 'PAN Card*') {
             panCardPath = result.files.single.path;
-          } else if (documentType == 'Certificate') {
-            certificatePath = result.files.single.path;
-          } else if (documentType == 'Aadhar Card*') {
+          } else if (documentType == 'ProfilePhoto*') {
+            profilePhotoPath = result.files.single.path;
+          }
+          // else if (documentType == 'Certificate') {
+          //   certificatePath = result.files.single.path;
+          // }
+          else if (documentType == 'Aadhar Card*') {
             aadharCardPath = result.files.single.path;
           } else if (documentType == 'Bank Proof*') {
             bankProofPath = result.files.single.path;
@@ -95,43 +103,16 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
     }
   }
 
-  // void _onSubmitButtonPressed() {
-  //   if (_areStarredFieldsAuthenticated()) {
-  //     // Perform form submission here
-  //     Navigator.of(context).push(
-  //       MaterialPageRoute(builder: (context) => LoginPage()),
-  //     );
-  //   } else {
-  //     showDialog(
-  //       context: context,
-  //       builder: (BuildContext context) {
-  //         return AlertDialog(
-  //           title: Text("Error"),
-  //           content: Text("Please Upload All Required Documents."),
-  //           actions: <Widget>[
-  //             TextButton(
-  //               child: Text("OK"),
-  //               onPressed: () {
-  //                 Navigator.of(context).pop(); // Close the dialog
-  //               },
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     );
-  //   }
-  // }
-
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 110,),
+            const SizedBox(height: 110,),
 
             // Code for Document Upload
 
@@ -143,23 +124,24 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
 
             // Code for List of Documents Display
 
-            SizedBox(height: 20.0),
+            const SizedBox(height: 20.0),
             _buildDocumentField('PAN Card*', panCardPath),
             _buildDocumentField('Aadhar Card*', aadharCardPath),
             _buildDocumentField('Light Bill', lightBillPath),
-            _buildDocumentField('Certificate', certificatePath),
+            // _buildDocumentField('Certificate', certificatePath),
             _buildDocumentField('Bank Proof*', bankProofPath),
             _buildDocumentField('Education Certificate', educationCertificatePath),
-            SizedBox(height: 20.0),
+            _buildDocumentField('ProfilePhoto*', profilePhotoPath),
+            const SizedBox(height: 20.0),
 
             // Code for Submit Button
 
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 35),
+              padding: const EdgeInsets.symmetric(horizontal: 35),
               child: MaterialButton(
                 minWidth: double.infinity,
                 onPressed: _onSubmitButtonPressed,
@@ -187,9 +169,9 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
       children: [
         Text(
           documentType,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
 
         // Code for To Display File Status
 
@@ -206,11 +188,11 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
                 primary: Colors.teal, // Set button background color to teal
                 onPrimary: Colors.white, // Set text color to white
               ),
-              child: Text('Select File'),
+              child: const Text('Select File'),
             ),
           ],
         ),
-        SizedBox(height: 16.0),
+        const SizedBox(height: 16.0),
       ],
     );
   }

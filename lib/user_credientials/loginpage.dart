@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:service/user_credientials/register_1.dart';
 import 'package:http/http.dart' as http;
@@ -108,13 +109,13 @@ class _LoginPageState extends State<LoginPage> {
         // Login successful, you can navigate to the next screen
         print("Login successful");
         final user = json.decode(response.body)[0];
-        // try {
-        //   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-        //   sharedPreferences.setString('mobile', _mobileController.text);
-        // } catch (e) {
-        //   // Handle the exception, e.g., print an error message.
-        //   print('Error: $e');
-        // }
+        try {
+          final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+          sharedPreferences.setString('mobile', _mobileController.text);
+        } catch (e) {
+          // Handle the exception, e.g., print an error message.
+          print('Error: $e');
+        }
 
 
         Navigator.pushReplacement(
@@ -150,153 +151,161 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
 
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              'Login',
-              style: TextStyle(
-                fontSize: 35,
-                color: Colors.teal.shade300,
-                fontWeight: FontWeight.bold,
+    return WillPopScope(
+      onWillPop: () async {
+        // Handle back button press here
+        // You can use the following code to exit the app:
+        SystemNavigator.pop();
+        return true;
+      },
+      child: MaterialApp(
+        home: Scaffold(
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                'Login',
+                style: TextStyle(
+                  fontSize: 35,
+                  color: Colors.teal.shade300,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 30),
-              child: Form(
-                key: _formKey,
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 30),
+                child: Form(
+                  key: _formKey,
 
-                child: Column(
-                  children: [
+                  child: Column(
+                    children: [
 
-                    // Code for Enter Mobile number
+                      // Code for Enter Mobile number
 
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: TextFormField(
-                        controller: _mobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(
-                          labelText: 'Mobile',
-                          hintText: 'Enter Mobile Number',
-                          prefixIcon: Icon(Icons.mobile_friendly),
-                          border: OutlineInputBorder(),
-                        ),
-                        onChanged: (String value) {},
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Please enter a mobile';
-                          } else if (value.length < 10) {
-                            return 'Mobile number must be 10 Digits';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 30),
-
-                    // Code for Enter Mobile number
-
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15),
-                      child: TextFormField(
-                        controller: _passwordController,
-                        keyboardType: TextInputType.visiblePassword,
-                        obscureText: !_passwordVisible,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                          hintText: 'Enter Password',
-                          prefixIcon: Icon(Icons.password),
-                          border: OutlineInputBorder(),
-                          // Password visibility toggle
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _passwordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _passwordVisible = !_passwordVisible;
-                              });
-                            },
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
+                          controller: _mobileController,
+                          keyboardType: TextInputType.phone,
+                          decoration: const InputDecoration(
+                            labelText: 'Mobile',
+                            hintText: 'Enter Mobile Number',
+                            prefixIcon: Icon(Icons.mobile_friendly),
+                            border: OutlineInputBorder(),
                           ),
+                          onChanged: (String value) {},
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return 'Please enter a mobile';
+                            } else if (value.length < 10) {
+                              return 'Mobile number must be 10 Digits';
+                            }
+                            return null;
+                          },
                         ),
-                        onChanged: (String value) {},
-                        validator: (value) {
-                          return value!.isEmpty
-                              ? 'Please Enter Password'
-                              : null;
-                        },
                       ),
-                    ),
-                    SizedBox(height: 30),
+                      SizedBox(height: 30),
 
-                    // Code for Login Button
+                      // Code for Enter Mobile number
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 35),
-                  child: MaterialButton(
-                    minWidth: double.infinity,
-                    onPressed: () async {
-                      // Handle login logic here
-                      if (_formKey.currentState!.validate()) {
-                        // Show loading indicator
-                        setState(() {
-                          _isLoading = true;
-                        });
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: TextFormField(
+                          controller: _passwordController,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: !_passwordVisible,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            hintText: 'Enter Password',
+                            prefixIcon: Icon(Icons.password),
+                            border: OutlineInputBorder(),
+                            // Password visibility toggle
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _passwordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _passwordVisible = !_passwordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                          onChanged: (String value) {},
+                          validator: (value) {
+                            return value!.isEmpty
+                                ? 'Please Enter Password'
+                                : null;
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 30),
 
-                        // Perform the login
-                        await _login();
+                      // Code for Login Button
 
-                        // Hide loading indicator after login completes
-                        setState(() {
-                          _isLoading = false;
-                        });
-                      }
-                    },
-                    color: Colors.teal,
-                    textColor: Colors.white,
-                    child: _isLoading
-                        ? const CircularProgressIndicator(
-                      color: Colors.white,
-                    ) // Show loading indicator when _isLoading is true
-                        : const Text(
-                      'Login',
-                      style: TextStyle(
-                        fontSize: 16,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 35),
+                    child: MaterialButton(
+                      minWidth: double.infinity,
+                      onPressed: () async {
+                        // Handle login logic here
+                        if (_formKey.currentState!.validate()) {
+                          // Show loading indicator
+                          setState(() {
+                            _isLoading = true;
+                          });
+
+                          // Perform the login
+                          await _login();
+
+                          // Hide loading indicator after login completes
+                          setState(() {
+                            _isLoading = false;
+                          });
+                        }
+                      },
+                      color: Colors.teal,
+                      textColor: Colors.white,
+                      child: _isLoading
+                          ? const CircularProgressIndicator(
+                        color: Colors.white,
+                      ) // Show loading indicator when _isLoading is true
+                          : const Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                    SizedBox(height: 20),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => RegistrationPage(),
+                      SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => RegistrationPage(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Not Registered? Register Here',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.redAccent[100],
+                            decoration: TextDecoration.underline,
                           ),
-                        );
-                      },
-                      child: Text(
-                        'Not Registered? Register Here',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.redAccent[100],
-                          decoration: TextDecoration.underline,
                         ),
-                      ),
-                    )
-                  ],
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

@@ -2,13 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Screens/Home_screen.dart';
 import '../user_credientials/loginpage.dart';
-
+// import 'HomePage.dart';
+// import 'main.dart';
 
 
 // String finalmobile = ' '  ;
@@ -17,6 +19,8 @@ class SplashScreen extends StatefulWidget {
   // final String mobileNumber; // Declare mobileNumber as a property
   //
   // SplashScreen({required this.mobileNumber});
+
+
 
 
 
@@ -29,8 +33,8 @@ class SplashScreen extends StatefulWidget {
 class SplashScreenState extends State<SplashScreen> {
 
   // static const String KEYLOGIN = "Mobile_Login";
-  // double screenHeight = 0;
-  // double screenWidth = 0;
+  double screenHeight = 0;
+  double screenWidth = 0;
 
 
   @override
@@ -55,7 +59,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   void navigateToHomePage(String mobileNumber) {
     Timer(
-        Duration(seconds: 2),
+        Duration(
+            // seconds: 3
+            milliseconds: 2500),
             () => Get.to(() => HomePage(mobileNumber: mobileNumber))
       // Get.to(HomePage(mobileNumber: mobileNumber)),
     );
@@ -63,7 +69,9 @@ class SplashScreenState extends State<SplashScreen> {
 
   void navigateToLoginPage() {
     Timer(
-        Duration(seconds: 2),
+        Duration(
+          // seconds: 3
+            milliseconds: 2450),
             () => Get.to(() => LoginPage())
       // Get.to(LoginPage()),
     );
@@ -100,34 +108,26 @@ class SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
 
-    // screenHeight = MediaQuery.of(context).size.height;
-    // screenWidth = MediaQuery.of(context).size.width;
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      // body:
+      body: Center(
 
-      body: Container(
-        // Use Image.asset as the background
-        decoration: const BoxDecoration(
-          color: Colors.teal,
-          image: DecorationImage(
-            image: AssetImage('assets/image/demo.jpg'), // Replace with your image asset
-            fit: BoxFit.cover,
-          ),
-        ),
-      ),
+    child: SingleChildScrollView(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Text("Hello User, Mobile Number: ${widget.mobileNumber}"),
+        SizedBox(height: screenHeight,
+          width: screenWidth,
+          child: const Image(image:
+          AssetImage('assets/image/jaymatadi.gif')),)
+      ],
+    ),
+    )
+    ),
     );
-    //         child: Image.asset(
-    //           'assets/images/cover1.jpg',
-    //           fit: BoxFit.cover,
-    //         ),
-    //       ),
-    //     ],
-    //   ),
-    // );
   }
 }
-
-
-
-
-
