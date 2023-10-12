@@ -2,6 +2,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:service/user_credientials/loginpage.dart';
 
+import '../Screens/Home_screen.dart';
+
 class DocumentUploadPage extends StatefulWidget {
   final String mobileNumber;
   const DocumentUploadPage({super.key, required this.mobileNumber});
@@ -87,10 +89,9 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
           duration: Duration(seconds: 3),
         ),
       );
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(builder: (context) => LoginPage(),
-      //   ),
-      // );
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (context) => HomePage(mobileNumber: widget.mobileNumber,),)
+      );
       // You can access the selected file paths like panCardPath, aadharCardPath, etc.
     } else {
       // Display an error message if starred fields are not authenticated.
@@ -112,7 +113,7 @@ class _DocumentUploadPageState extends State<DocumentUploadPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 110,),
+            const SizedBox(height: 5,),
 
             // Code for Document Upload
 

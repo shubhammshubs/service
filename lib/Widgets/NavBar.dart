@@ -7,8 +7,12 @@ import 'package:service/user_credientials/loginpage.dart';
 import 'package:service/user_credientials/user_documents_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../CallS/New_Calls.dart';
 import '../Screens/Home_screen.dart';
+import '../Screens/Profile_Screen.dart';
 import '../draftTest.dart';
+import '../main.dart';
+import 'DraftTest2.dart';
 
 class NavBar extends StatelessWidget {
   final String mobileNumber;
@@ -80,8 +84,6 @@ class NavBar extends StatelessWidget {
                           },
                         );
                       },
-
-
                       child: const CircleAvatar(
                         radius: 45, // Adjust the size of the image as needed
                         backgroundImage: AssetImage('assets/image/splash.png'),
@@ -126,6 +128,24 @@ class NavBar extends StatelessWidget {
               );
             }
           ),
+            ListTile(
+                leading: const Icon(Icons.dashboard),
+                title: const Text('Show Profile'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => UserProfileScreen(mobileNumber: mobileNumber, ),)
+                  );
+                }
+            ),
+            ListTile(
+                leading: const Icon(Icons.dashboard),
+                title: const Text('Show Image'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => MyApp12(mobileNumber: mobileNumber,),)
+                  );
+                }
+            ),
           ExpansionTile(
             textColor: Colors.teal,
             iconColor: Colors.teal,
@@ -133,52 +153,55 @@ class NavBar extends StatelessWidget {
             leading: const Icon(Icons.perm_contact_cal_outlined),
             title: const Text('Profile'),
 
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.arrow_right),
-                title: const Text('StepperExample'),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => strip(mobileNumber: mobileNumber,),),
-                  );
-                  // Handle Information sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.arrow_right),
-                title: const Text('Information'),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => UserInfoPage(mobileNumber: mobileNumber,),),
-                  );
-                  // Handle Information sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.arrow_right),
-                title: const Text('Registration'),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: mobileNumber,),),
-                  );
-                  // Handle Registration sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.arrow_right),
-                title: const Text('Documents'),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: mobileNumber,),),
-                  );
-                  // Handle Documents sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
-                },
-              ),
-            ],
+            // children: <Widget>[
+            //   ListTile(
+            //     leading: const Icon(Icons.arrow_right),
+            //     title: const Text('StepperExample'),
+            //     onTap: () {
+            //       Navigator.of(context).push(
+            //         MaterialPageRoute(builder: (context) => StepperPage(mobileNumber: mobileNumber,),),
+            //       );
+            //       // Handle Information sub-menu item click
+            //       // Navigator.of(context).pop(); // Close the drawer if needed
+            //     },
+            //   ),
+            //   ListTile(
+            //     leading: const Icon(Icons.arrow_right),
+            //     title: const Text('Information'),
+            //     // trailing: const Icon(Icons.check,color: Colors.green,), // Icon on the right side
+            //
+            //     onTap: () {
+            //       Navigator.of(context).push(
+            //         MaterialPageRoute(builder: (context) => UserInfoPage(mobileNumber: mobileNumber,),),
+            //       );
+            //       // Handle Information sub-menu item click
+            //       // Navigator.of(context).pop(); // Close the drawer if needed
+            //     },
+            //
+            //   ),
+            //   ListTile(
+            //     leading: const Icon(Icons.arrow_right),
+            //     title: const Text('Registration'),
+            //     onTap: () {
+            //       Navigator.of(context).push(
+            //         MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: mobileNumber,),),
+            //       );
+            //       // Handle Registration sub-menu item click
+            //       // Navigator.of(context).pop(); // Close the drawer if needed
+            //     },
+            //   ),
+            //   ListTile(
+            //     leading: const Icon(Icons.arrow_right),
+            //     title: const Text('Documents'),
+            //     onTap: () {
+            //       Navigator.of(context).push(
+            //         MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: mobileNumber,),),
+            //       );
+            //       // Handle Documents sub-menu item click
+            //       // Navigator.of(context).pop(); // Close the drawer if needed
+            //     },
+            //   ),
+            // ],
           ),
           const ListTile(
             title: Text('Service Calls',
@@ -188,10 +211,11 @@ class NavBar extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.add_ic_call_sharp),
             title: const Text('New Calls'),
-            onTap: () {
-              // Handle Service Calls menu item click
-              // Navigator.of(context).pop(); // Close the drawer if needed
-            },
+              onTap: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => newcall(mobileNumber: mobileNumber,),)
+                );
+              }
           ),
           ExpansionTile(
             textColor: Colors.teal,

@@ -84,10 +84,33 @@ class _registerInfoPage extends State<registerInfoPage> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),
-        ),
-      );
+      void showMessageBox() {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Message"),
+              content: Text("${response.body} \n\n Go To Next Page"),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("OK"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    // Navigate to Step 2
+                    // _onStepTapped(1); // Assuming Step 2 is at index 1
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+
+      showMessageBox();
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),
+      //   ),
+      // );
     } else {
       // Error response from the API
       // Handle the error, e.g., show an error message
@@ -124,9 +147,6 @@ class _registerInfoPage extends State<registerInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text('Additional Credentials'),
-      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding:  const EdgeInsets.symmetric(vertical: 30),
@@ -136,7 +156,7 @@ class _registerInfoPage extends State<registerInfoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 110,),
+                // const SizedBox(height: 110,),
                 Text(
                   'Registration Information ',
                   style: TextStyle(
