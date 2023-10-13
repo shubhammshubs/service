@@ -39,38 +39,42 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: screenWidth, // Adjust the width as needed
-              height: 50.0,
-              decoration: BoxDecoration(
-                border: Border.all(
-                  width: 2.0,
-                  color: Colors.teal
-                )
-              ),// Adjust the height as needed
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  const Text("Please Register Before Continuing"),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => StepperPage(mobileNumber: widget.mobileNumber,),),
-                      );
-
-                    },
-                    child: Text("Register Now"),
-                  ),
-                ],
-              ),
-            ),
+            // Container(
+            //   width: screenWidth, // Adjust the width as needed
+            //   height: 50.0,
+            //   decoration: BoxDecoration(
+            //     border: Border.all(
+            //       width: 2.0,
+            //       color: Colors.teal
+            //     )
+            //   ),// Adjust the height as needed
+            //   // child: Row(
+            //   //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //   //   children: [
+            //   //     const Text("Please Register Before Continuing"),
+            //   //     ElevatedButton(
+            //   //       onPressed: () {
+            //   //         Navigator.push(
+            //   //           context,
+            //   //           MaterialPageRoute(
+            //   //             builder: (context) => StepperPage(mobileNumber: widget.mobileNumber,),),
+            //   //         );
+            //   //
+            //   //       },
+            //   //       child: Text("Register Now"),
+            //   //     ),
+            //   //   ],
+            //   // ),
+            // ),
             Center(
               child: Text("Hello User, Mobile Number: ${widget.mobileNumber}"),
             ),
+
+            // buildApiEntry(apiData),
+
+
 
             // Wrap the text and button inside a square Container
 
