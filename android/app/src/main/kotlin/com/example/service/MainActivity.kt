@@ -1,4 +1,4 @@
-package com.example.service
+package com.Trifrnd.service
 
 import io.flutter.embedding.android.FlutterActivity
 

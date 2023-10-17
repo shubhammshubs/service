@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../API/Display_Accepted_Call_API.dart';
+import '../API/Update_status_call_inAccepted.dart';
 import '../Widgets/NavBar.dart';
 
 
@@ -35,6 +36,141 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
       });
     }
   }
+  // Future<http.Response> updateCallStatus(String callId, String status, String remark) async {
+  //   final response = await http.post(
+  //     Uri.parse('https://apip.trifrnd.com/Services/eng/sereng.php?apicall=updatestatus'),
+  //     body: {
+  //       'id': callId,
+  //       'status': status,
+  //       'callremark': remark,
+  //     },
+  //   );
+  //   return response;
+  // }
+
+  void showUpdateDialog(BuildContext context, String callId) {
+    String selectedStatus = 'Select Status';
+    String remark = '';
+
+    void handleUpdate() async {
+      final status = selectedStatus;
+      final callRemark = remark;
+
+      if (status == 'Select Status') {
+        // Handle invalid status selection, e.g., show an error message.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please select a status.')),
+        );
+        return;
+      }
+
+      final response = await updateCallStatus(callId, status, callRemark);
+
+      if (response.statusCode == 200) {
+        // Successfully updated the status and remark
+        print(response.body);
+        print(response.statusCode);
+        Navigator.of(context).pop();
+        // Optionally, you can show a success message or perform any other actions here.
+      } else {
+        print(response.body);
+        print(response.statusCode);
+        // Handle the case where the API request fails
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update status and remark.')),
+        );
+      }
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Take Action'),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Call ID: $callId'),
+                  SizedBox(height: 10),
+                  Text('Status:'),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: DropdownButton<String>(
+                      value: selectedStatus,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStatus = value!;
+                        });
+                      },
+                      items: <String>[
+                        'Select Status',
+                        'Completed',
+                        'Hold',
+                        'In Process',
+                        'Incomplete',
+                      ].map((String status) {
+                        return DropdownMenuItem<String>(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text('Remark:'),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your remark',
+                        border: InputBorder.none,
+                      ),
+                      maxLines: 3,
+                      onChanged: (value) {
+                        setState(() {
+                          remark = value;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                ],
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Update'),
+
+                onPressed: handleUpdate,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -349,9 +485,8 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
                 const SizedBox(height: 10,),
                 ElevatedButton(
                   onPressed: () {
-                    // // We are passing this data to acceptcall class present in Acceped_Call_API
-                    // acceptCall(apiData['id'],widget.mobileNumber);
-
+                    final callId = (apiData?['id'] ?? 0).toString();
+                    showUpdateDialog(context, callId);
                   },
                   child: const Text('Take Action'),
                 )

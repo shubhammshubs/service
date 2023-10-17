@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:service/CallS/Completed_Calls.dart';
 import 'package:service/user_credientials/info_form.dart';
 import 'package:service/user_credientials/info_form_2_register.dart';
 import 'package:service/user_credientials/loginpage.dart';
@@ -8,6 +9,9 @@ import 'package:service/user_credientials/user_documents_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../CallS/Accepted_Calls.dart';
+import '../CallS/Hold_Calls.dart';
+import '../CallS/InProcess_Calls.dart';
+import '../CallS/Incomplete_Calls.dart';
 import '../CallS/New_Calls.dart';
 import '../Screens/Home_screen.dart';
 import '../Screens/Profile_Screen.dart';
@@ -143,7 +147,7 @@ class NavBar extends StatelessWidget {
             //     title: const Text('Show Image'),
             //     onTap: () {
             //       Navigator.of(context).push(
-            //           MaterialPageRoute(builder: (context) => MyApp12(mobileNumber: mobileNumber,),)
+            //           MaterialPageRoute(builder: (context) => CompletedCallsDemo(mobileNumber: mobileNumber,),)
             //       );
             //     }
             // ),
@@ -241,26 +245,38 @@ class NavBar extends StatelessWidget {
 
                 title: const Text('In-Process Calls'),
                 onTap: () {
-                  // Handle In-Process Calls sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => InProcessCalls(mobileNumber: mobileNumber,),)
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.arrow_right),
                 title: const Text('Hold Calls'),
                 onTap: () {
-                  // Handle Hold Calls sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => HoldCalls(mobileNumber: mobileNumber,),)
+                  );
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.arrow_right),
                 title: const Text('Completed Calls'),
                 onTap: () {
-                  // Handle Completed Calls sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => CompletedCalls(mobileNumber: mobileNumber,),)
+                  );
                 },
               ),
+              ListTile(
+                leading: const Icon(Icons.arrow_right),
+                title: const Text('InCompleted Calls'),
+                onTap: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (context) => InCompleteCalls(mobileNumber: mobileNumber,),)
+                  );
+                },
+              )
             ],
           ),
           ListTile(
