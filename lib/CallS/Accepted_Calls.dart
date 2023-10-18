@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 import '../API/Display_Accepted_Call_API.dart';
@@ -58,9 +59,14 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
 
       if (status == 'Select Status') {
         // Handle invalid status selection, e.g., show an error message.
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please select a status.')),
+        Fluttertoast.showToast(msg: 'Please select a status.',
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
         );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Please select a status.')),
+        // );
         return;
       }
 
@@ -70,14 +76,21 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
         // Successfully updated the status and remark
         print(response.body);
         print(response.statusCode);
+        Fluttertoast.showToast(msg: "Status updated successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
         Navigator.of(context).pop();
-        // Optionally, you can show a success message or perform any other actions here.
+
       } else {
         print(response.body);
         print(response.statusCode);
         // Handle the case where the API request fails
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update status and remark.')),
+        Fluttertoast.showToast(msg: 'Failed to Update Status',
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
         );
       }
     }
@@ -160,8 +173,11 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
             ),
             TextButton(
               child: Text('Update'),
-
-                onPressed: handleUpdate,
+              onPressed: () {
+                handleUpdate();
+                Navigator.of(context).pop();
+              },
+              // onPressed: handleUpdate,
             ),
           ],
         );
@@ -485,8 +501,11 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
                 const SizedBox(height: 10,),
                 ElevatedButton(
                   onPressed: () {
+                    Navigator.of(context).pop();
+
                     final callId = (apiData?['id'] ?? 0).toString();
                     showUpdateDialog(context, callId);
+
                   },
                   child: const Text('Take Action'),
                 )

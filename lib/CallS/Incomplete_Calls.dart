@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:service/Screens/Home_screen.dart';
 
+import '../API/Update_status_call_inAccepted.dart';
 import '../Widgets/NavBar.dart';
-//
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+
 
 class InCompleteCalls extends StatefulWidget {
   final String mobileNumber;
@@ -15,14 +19,27 @@ class InCompleteCalls extends StatefulWidget {
 }
 
 class _HoldCallsState extends State<InCompleteCalls> {
+  late BuildContext myContext;
+
   List<Map<String, dynamic>> apiDataList = [];
   double screenHeight = 0;
   double screenWidth = 0;
+  bool isLoading = false; // Add this variable
+  bool _isMounted = false; // Add this variable
+
+
 
   @override
   void initState() {
     super.initState();
+    _isMounted = true; // Widget is mounted
+
     fetchData();
+  }
+  @override
+  void dispose() {
+    _isMounted = false; // Widget is no longer mounted
+    super.dispose();
   }
 
   void fetchData() async {
@@ -30,6 +47,14 @@ class _HoldCallsState extends State<InCompleteCalls> {
       Uri.parse("https://apip.trifrnd.com/Services/eng/sereng.php?apicall=readnotcompleted"),
       body: {"AcceptedBy": widget.mobileNumber},
     );
+
+    if (_isMounted) {
+      setState(() {
+        isLoading = true; // Show the loading symbol
+      });
+    } else {
+      return; // Widget is not mounted, don't call setState
+    }
 
     if (response.statusCode == 200) {
       final List<Map<String, dynamic>> dataList = List<Map<String, dynamic>>.from(json.decode(response.body));
@@ -46,10 +71,191 @@ class _HoldCallsState extends State<InCompleteCalls> {
       throw Exception('Failed to load data');
     }
   }
+  // For Take ACtion Button
+  void showUpdateDialog(BuildContext context, String callId) {
+    String selectedStatus = 'Incomplete';
+    String remark = '';
+
+    void handleUpdate() async {
+      final status = selectedStatus;
+      final callRemark = remark;
+
+      if (status == 'Select Status') {
+        // Handle invalid status selection, e.g., show an error message.
+        Fluttertoast.showToast(msg: 'Please select a status.',
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        return;
+      }
+
+      if (callRemark.isEmpty) {
+        Fluttertoast.showToast(
+          msg: 'Please enter a remark.',
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        return;
+      }
+      setState(() {
+        isLoading = true; // Show the loading symbol
+      });
+
+      final response = await updateCallStatus(callId, status, callRemark);
+
+      if (_isMounted) {
+        setState(() {
+          isLoading = false; // Hide the loading symbol
+        });
+      } else {
+        return; // Widget is not mounted, don't call setState
+      }
+
+      // await Future.delayed(Duration(seconds: 10)); // Wait for 1 second
+
+      if (response.statusCode == 200) {
+        // Successfully updated the status and remark
+        print(response.body);
+        print(response.statusCode);
+
+        Fluttertoast.showToast(msg: "Status updated successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        // After updating, fetch the data again to reflect the changes
+        fetchData();
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => InCompleteCalls(mobileNumber: widget.mobileNumber),
+          ),
+        );
+
+        Navigator.of(context).pop();
+      }
+
+      else {
+        print(response.body);
+        print(response.statusCode);
+        // Handle the case where the API request fails
+        Fluttertoast.showToast(msg: 'Failed to Update Status',
+          toastLength: Toast.LENGTH_SHORT,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+
+        // setState(() {
+        //   isLoading = false; // Hide the loading symbol
+        // });
+      }
+
+
+
+
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Take Action'),
+          content: StatefulBuilder(
+            builder: (context, setState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text('Call ID: $callId'),
+                  SizedBox(height: 10),
+                  Text('Status:'),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: DropdownButton<String>(
+                      value: selectedStatus,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedStatus = value!;
+                        });
+                      },
+                      items: <String>[
+                        'Select Status',
+                        'Completed',
+                        'Hold',
+                        'In Process',
+                        'Incomplete',
+                      ].map((String status) {
+                        return DropdownMenuItem<String>(
+                          value: status,
+                          child: Text(status),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text('Remark:'),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: TextField(
+                      decoration: const InputDecoration(
+                        labelText: 'Enter your remark',
+                        border: InputBorder.none,
+                      ),
+                      maxLines: 3,
+                      onChanged: (value) {
+                        setState(() {
+                          remark = value;
+                        });
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 20),
+
+                ],
+              );
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Update'),
+              onPressed: () {
+                handleUpdate();
+                Navigator.of(context).pop();
+                // Navigator.of(context).pushReplacement(
+                //   MaterialPageRoute(
+                //     builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
+                //   ),
+                // );
+              },
+              // onPressed: handleUpdate,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   void _showDetailsDialog(Map<String, dynamic> item) {
     showDialog(
-      context: context,
+      context: context, // Use the context of the parent dialog
       builder: (BuildContext context) {
         return AlertDialog(
           title: Container(
@@ -130,7 +336,7 @@ class _HoldCallsState extends State<InCompleteCalls> {
 
                   // Text("Client Name: ${item['Client_Name']}"),
 
-                  const SizedBox(height: 10,),
+                  // const SizedBox(height: 10,),
 
                   // Text("category: ${item['category']}"),
                   RichText(
@@ -363,7 +569,24 @@ class _HoldCallsState extends State<InCompleteCalls> {
                     ),
                   ),
                   const SizedBox(height: 10,),
-                  Text("Status: ${item['status']}"),
+                  RichText(
+                    text: TextSpan(
+                      text: "Status: ",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold, // Make it bold
+                        color: Colors.black, // Set text color
+                      ),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: item['status'],
+                          style: const TextStyle(
+                            fontWeight: FontWeight.normal, // Reset to normal font weight
+                            color: Colors.black, // Set text color
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 10,),
 
 
@@ -373,6 +596,17 @@ class _HoldCallsState extends State<InCompleteCalls> {
             ),
           ),
           actions: <Widget>[
+
+            ElevatedButton(
+              onPressed: () {
+                // onPressed: () {
+                Navigator.of(context).pop();
+                final callId = (item['id'] ?? 0).toString();
+                // Call the method to show the update dialog directly from here
+                showUpdateDialog(context, callId);
+              },
+              child: const Text('Take Action'),
+            ),
             TextButton(
               child: const Text('Close'),
               onPressed: () {
@@ -395,93 +629,112 @@ class _HoldCallsState extends State<InCompleteCalls> {
         backgroundColor: Colors.teal,
         centerTitle: true,
         title: const Text(
-          'Incomplete Calls',
+          'In Complete Calls',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
       drawer: NavBar(mobileNumber: widget.mobileNumber),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: <Widget>[
-              if (apiDataList.isEmpty)
-                const Column(
-                  children: [
-                    SizedBox(height: 250,),
-                    Center(
-                      child: Text(
-                        'No Calls.',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.black26,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              if (apiDataList.isNotEmpty)
-                const SizedBox(height: 20,),
-              DataTable(
-                columnSpacing: 10, // Adjust this value to control the spacing between columns
-                columns: const [
-                  DataColumn(
-                    label: Center(child: Text("Call ID")),
-                  ),
-                  DataColumn(
-                    label: Center(child: Text("Call Booked \n Date")),
-                  ),
-                  DataColumn(
-                    label: Center(child: Text("Call Title")),
-                  ),
-                  DataColumn(
-                    label: Center(child: Text("Action")),
-                  ),
-                ],
-                rows: apiDataList.map((item) {
-                  int index = apiDataList.indexOf(item) + 1;
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(item['id'].toString()),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          height: 30, // Set the height of this cell
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(item['callBooked'].toString()),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          height: 30, // Set the height of this cell
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Text(item['callTitle'].toString()),
-                        ),
-                      ),
-                      DataCell(
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              _showDetailsDialog(item);
-                            },
-                            child: const Text("View"),
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(Colors.teal),
-                            ),
+      body:  LiquidPullToRefresh(
+        color: Colors.teal,
+        springAnimationDurationInMilliseconds: 500,
+        onRefresh:  () async {
+          // Implement your refresh logic here
+          await Future.delayed(Duration(seconds: 2)); // Simulate a delay
+          fetchData(); // Fetch your data again
+        },
+        showChildOpacityTransition: false, // Disable child opacity transition
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                if (apiDataList.isEmpty)
+                  const Column(
+                    children: [
+                      SizedBox(height: 250,),
+                      Center(
+                        child: Text(
+                          'No Completed Calls.',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black26,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ],
-                  );
-                }).toList(),
-              )
-              ,
-            ],
+                  ),
+                if (apiDataList.isNotEmpty)
+                  const SizedBox(height: 20,),
+                DataTable(
+                  columnSpacing:10,
+                  // dividerThickness: 1,
+                  columns: const [
+                    DataColumn(
+                      label: Center(child: Text("Call ID")),
+                    ),
+                    DataColumn(
+                      label: Center(child: Text("Call Booked \nDate")),
+                    ),
+                    DataColumn(
+                      label: Center(child: Text("Call \nTitle")),
+                    ),
+                    DataColumn(
+                      label: Center(child: Text("   Action")),
+                    ),
+                  ],
+                  rows: apiDataList.map((item) {
+                    int index = apiDataList.indexOf(item) + 1;
+                    return DataRow(
+                      cells: [
+
+                        DataCell(
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
+                            child: Text(item['id'].toString().trim()),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 15), // Adjust the padding to control cell spacing
+                            child: Text(item['callBooked'].toString().trim()),
+                          ),
+                        ),
+                        DataCell(
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5), // Adjust the padding to control cell spacing
+                            child: Text(item['callTitle'].toString().trim()),
+                          ),
+                        ),
+                        // DataCell(
+                        //   Container(
+                        //     padding: EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
+                        //     child: Text(item['city'].toString()),
+                        //   ),
+                        // ),
+                        DataCell(
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
+                            child: ElevatedButton(
+
+                              onPressed: () {
+                                _showDetailsDialog(item);
+                              },
+                              child: const Text("View"),
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all<Color>(Colors.teal),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                Container(
+                  height: 600, // Adjust the height as needed
+                ),
+              ],
+            ),
           ),
         ),
       ),

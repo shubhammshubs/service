@@ -421,19 +421,20 @@ class _CompletedCallsState extends State<CompletedCalls> {
               if (apiDataList.isNotEmpty)
                 const SizedBox(height: 20,),
               DataTable(
-                columnSpacing: 10, // Adjust this value to control the spacing between columns
+                columnSpacing:10,
+                // dividerThickness: 1,
                 columns: const [
                   DataColumn(
                     label: Center(child: Text("Call ID")),
                   ),
                   DataColumn(
-                    label: Center(child: Text("Call Booked \n Date")),
+                    label: Center(child: Text("Call Booked \nDate")),
                   ),
                   DataColumn(
-                    label: Center(child: Text("Call Title")),
+                    label: Center(child: Text("Call \nTitle")),
                   ),
                   DataColumn(
-                    label: Center(child: Text("Action")),
+                    label: Center(child: Text("   Action")),
                   ),
                 ],
                 rows: apiDataList.map((item) {
@@ -444,19 +445,19 @@ class _CompletedCallsState extends State<CompletedCalls> {
                       DataCell(
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
-                          child: Text(item['id'].toString()),
+                          child: Text(item['id'].toString().trim()),
                         ),
                       ),
                       DataCell(
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
-                          child: Text(item['callBooked'].toString()),
+                          padding: const EdgeInsets.symmetric(horizontal: 15), // Adjust the padding to control cell spacing
+                          child: Text(item['callBooked'].toString().trim()),
                         ),
                       ),
                       DataCell(
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10), // Adjust the padding to control cell spacing
-                          child: Text(item['callTitle'].toString()),
+                          padding: const EdgeInsets.symmetric(horizontal: 5), // Adjust the padding to control cell spacing
+                          child: Text(item['callTitle'].toString().trim()),
                         ),
                       ),
                       // DataCell(
