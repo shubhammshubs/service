@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:service/user_credientials/user_documents_page.dart';
@@ -18,6 +21,8 @@ class registerInfoPage extends StatefulWidget {
 class _registerInfoPage extends State<registerInfoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
+  List<String> educations = [];
+  String? selectedEducation;
   // We use string for user entered Inputs
   String? panNumber;
   String? aadharCardNumber;
@@ -27,6 +32,8 @@ class _registerInfoPage extends State<registerInfoPage> {
   String? bankName;
   String? bankAccountNumber;
   String? bankIFSCCode;
+
+
 
   // FocusNode instances for each of your input fields
   final FocusNode panNumberFocus = FocusNode();
@@ -38,6 +45,34 @@ class _registerInfoPage extends State<registerInfoPage> {
   final FocusNode bankAccountNumberFocus = FocusNode();
   final FocusNode bankIFSCCodeFocus = FocusNode();
 
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEducationData();
+
+    // Perform any initializations here if needed.
+  }
+
+  //  FOr drop Down List of Education
+  Future<void> fetchEducationData() async {
+    final response = await http.get(
+      Uri.parse('https://apip.trifrnd.com/services/eng/sereng.php?apicall=readeducation'),
+    );
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(response.body);
+      List<String> educationList = data
+          .map((item) => item['Edu_Name'].toString())
+          .toList();
+      setState(() {
+        educations = educationList;
+      });
+    } else {
+      throw Exception('Failed to load education data');
+    }
+  }
+
   Future<void> registeUserInfo() async {
     // Construct the request body with user information
     // Format the date as "dd-MM-yyyy"
@@ -48,8 +83,7 @@ class _registerInfoPage extends State<registerInfoPage> {
       'mobile': widget.mobileNumber,
       'PAN_No': panNumber,
       'Aadhar_No': aadharCardNumber ?? '',
-      'Last_Edu': lastEducation ?? '',
-      // 'DoB': lastEducationYear, // Use the formatted date
+      'Last_Edu': selectedEducation ?? '',
       'Last_Edu_Year': lastEducationYear ?? '',
       'Work_Exp': workExperience ?? '',
       'Bank_Name': bankName ?? '',
@@ -124,11 +158,7 @@ class _registerInfoPage extends State<registerInfoPage> {
   }
 
 
-  @override
-  void initState() {
-    super.initState();
-    // Perform any initializations here if needed.
-  }
+
 
   // Once user goes to next cell previous cell will Close
   @override
@@ -158,7 +188,7 @@ class _registerInfoPage extends State<registerInfoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // const SizedBox(height: 110,),
+                const SizedBox(height: 20,),
                 Text(
                   'Registration Information ',
                   style: TextStyle(
@@ -178,6 +208,7 @@ class _registerInfoPage extends State<registerInfoPage> {
                   child: TextFormField(
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next, // Set the action
+                    textCapitalization: TextCapitalization.characters,
                     decoration: const InputDecoration(
                       labelText: 'PAN Number*',
                       hintText: 'Enter PAN Number',
@@ -185,7 +216,7 @@ class _registerInfoPage extends State<registerInfoPage> {
                       border: OutlineInputBorder(),
                     ),
                     onSaved: (value) {
-                      panNumber = value;
+                      panNumber = value?.toUpperCase();
                     },
                     validator: (value) {
                       final RegExp panRegex = RegExp(r'^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$');
@@ -212,7 +243,11 @@ class _registerInfoPage extends State<registerInfoPage> {
                       prefixIcon: Icon(FontAwesomeIcons.solidAddressCard),
 
                       border: OutlineInputBorder(),
+
                     ),
+                    inputFormatters: [
+                      LengthLimitingTextInputFormatter(12)
+                    ],
                     onSaved: (value) {
                       aadharCardNumber = value;
                     },
@@ -232,54 +267,104 @@ class _registerInfoPage extends State<registerInfoPage> {
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30,),
-                  child: TextFormField(
-                    keyboardType: TextInputType.text,
-                    textInputAction: TextInputAction.next, // Set the action
+                  child: DropdownButtonFormField<String?>(
+                    value: selectedEducation,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedEducation = newValue;
+                      });
+                    },
+                    items: [
+                      const DropdownMenuItem<String>(
+                        value: null,
+                        child: Text('Select Education'),
+                      ),
+                      ...educations
+                          .map((education) => DropdownMenuItem<String>(
+                        value: education,
+                        child: Text(education),
+                      ))
+                          .toList(),
+                      // ..sort((a, b) => a.child.toString().compareTo(b.child.toString())),
+                    ],
                     decoration: const InputDecoration(
-                      labelText: 'Last Education*',
-                      hintText: 'Enter Last Education',
-                      prefixIcon: Icon(FontAwesomeIcons.userGraduate),
-
+                      labelText: 'Education',
+                      prefixIcon: Icon(Icons.school),
                       border: OutlineInputBorder(),
                     ),
-                    onSaved: (value) {
-                      lastEducation = value;
-                    },
                     validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter Last Education';
+                      if (value == null) {
+                        return 'Please select an education';
                       }
                       return null;
                     },
+                    // onChanged: (newValue) {
+                    //   // Handle state change here
+                    // },
                   ),
                 ),
+
                 const SizedBox(height: 25),
 
                 // Code for Entering Last Education Year
 
+                // Padding(
+                //   padding: const EdgeInsets.symmetric(horizontal: 30,),
+                //   child: TextFormField(
+                //     keyboardType: TextInputType.number,
+                //     textInputAction: TextInputAction.next, // Set the action
+                //     decoration: const InputDecoration(
+                //       labelText: 'Last Education Year*',
+                //       hintText: 'Enter Last Education Year',
+                //       prefixIcon: Icon(FontAwesomeIcons.calendarCheck),
+                //
+                //       border: OutlineInputBorder(),
+                //     ),
+                //     onSaved: (value) {
+                //       lastEducationYear = value;
+                //     },
+                //     validator: (value) {
+                //       if (value!.isEmpty) {
+                //         return 'Please enter Last Education Year';
+                //       }
+                //       return null;
+                //     },
+                //   ),
+                // ),
+
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30,),
-                  child: TextFormField(
-                    keyboardType: TextInputType.number,
-                    textInputAction: TextInputAction.next, // Set the action
+                  child: DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Last Education Year*',
-                      hintText: 'Enter Last Education Year',
                       prefixIcon: Icon(FontAwesomeIcons.calendarCheck),
-
                       border: OutlineInputBorder(),
                     ),
-                    onSaved: (value) {
-                      lastEducationYear = value;
+                    value: lastEducationYear,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        lastEducationYear = newValue;
+                      });
                     },
+                    items: List<String>.generate(
+                      DateTime.now().year - 1969, (index) => (1970 + index).toString(),
+                    )
+                    .reversed
+                        .map((year) {
+                      return DropdownMenuItem<String>(
+                        value: year,
+                        child: Text(year),
+                      );
+                    }).toList(),
                     validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter Last Education Year';
+                      if (value == null) {
+                        return 'Please select Last Education Year';
                       }
                       return null;
                     },
                   ),
                 ),
+
                 const SizedBox(height: 25),
 
                 // Code for Entering Work Experience
@@ -371,6 +456,7 @@ class _registerInfoPage extends State<registerInfoPage> {
                   child: TextFormField(
                     keyboardType: TextInputType.text,
                     textInputAction: TextInputAction.next, // Set the action
+                    textCapitalization: TextCapitalization.characters,
                     decoration: const InputDecoration(
                       labelText: 'Bank IFSC Code*',
                       hintText: 'Enter Bank IFSC Code',

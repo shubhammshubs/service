@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
@@ -49,7 +50,7 @@ class _RegistrationFormState extends State<UserInfoPage> {
     super.initState();
     fetchListData();
   }
-
+  //  API for Dropdown List [state,District,City]
   Future<void> fetchListData() async {
     final response = await http.get(
         Uri.parse('https://apip.trifrnd.com/services/eng/sereng.php?apicall=readcities'));
@@ -366,7 +367,8 @@ class _RegistrationFormState extends State<UserInfoPage> {
                       ...getStates().map((state) => DropdownMenuItem<String?>(
                         value: state,
                         child: Text(state ?? ""),
-                      )),
+                      )).toList()
+                  ..sort((a, b) => a.child.toString().compareTo(b.child.toString())),
                     ],
                     decoration: const InputDecoration(
                       labelText: 'State*',
@@ -404,7 +406,8 @@ class _RegistrationFormState extends State<UserInfoPage> {
                       ...getDistricts().map((district) => DropdownMenuItem<String?>(
                         value: district,
                         child: Text(district ?? ""),
-                      )),
+                      )).toList()
+                        ..sort((a, b) => a.child.toString().compareTo(b.child.toString())),
                     ],
                     decoration: const InputDecoration(
                       labelText: 'District*',
@@ -438,7 +441,8 @@ class _RegistrationFormState extends State<UserInfoPage> {
                       ...getCities().map((city) => DropdownMenuItem<String?>(
                         value: city,
                         child: Text(city ?? ""),
-                      )),
+                      )).toList()
+                  ..sort((a, b) => a.child.toString().compareTo(b.child.toString())),
                     ],
                     decoration: const InputDecoration(
                       labelText: 'City*',
@@ -468,6 +472,9 @@ class _RegistrationFormState extends State<UserInfoPage> {
                       prefixIcon: Icon(FontAwesomeIcons.mapPin),
                       border: OutlineInputBorder(),
                     ),
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(6),  // Limit the input to 6 characters
+                      ],
 
                       validator: (value) {
                         final sanitizedValue = value?.replaceAll(" ", "");
@@ -489,17 +496,17 @@ class _RegistrationFormState extends State<UserInfoPage> {
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'Country*',
-                      hintText: 'Country',
                       prefixIcon: Icon(FontAwesomeIcons.earthAsia),
                       border: OutlineInputBorder(),
                     ),
-
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter your Country Name';
-                      }
-                      return null;
-                    },
+                    initialValue: 'INDIA', // Display "India" as the initial value
+                    enabled: false, // Make the field read-only
+                    // validator: (value) {
+                    //   if (value != 'India') {
+                    //     return 'Please select "India" as the country';
+                    //   }
+                    //   return null;
+                    // },
                   ),
                 ),
                 // TextFormField(
