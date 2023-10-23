@@ -84,29 +84,31 @@ class _registerInfoPage extends State<registerInfoPage> {
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-      void showMessageBox() {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Message"),
-              content: Text("${response.body} \n\n Go To Next Page"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navigate to Step 2
-                    // _onStepTapped(1); // Assuming Step 2 is at index 1
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-
-      showMessageBox();
+      // void showMessageBox() {
+      //   showDialog(
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return AlertDialog(
+      //         title: Text("Message"),
+      //         content: Text("${response.body} \n\n Go To Next Page"),
+      //         actions: <Widget>[
+      //           TextButton(
+      //             child: Text("OK"),
+      //             onPressed: () {
+      //               Navigator.of(context).pop();
+      //               // Navigate to Step 2
+      //               // _onStepTapped(1); // Assuming Step 2 is at index 1
+      //             },
+      //           ),
+      //         ],
+      //       );
+      //     },
+      //   );
+      // }
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),),
+      );
+      // showMessageBox();
       // Navigator.of(context).push(
       //   MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),
       //   ),

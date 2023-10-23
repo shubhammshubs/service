@@ -1,519 +1,5 @@
-// import 'package:flutter/foundation.dart';
-// import 'package:flutter/material.dart';
-// import 'package:fluttertoast/fluttertoast.dart';
-// import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-// import 'package:intl/intl.dart';
-// import 'package:http/http.dart' as http;
-//
-// import 'info_form_2_register.dart';
-//
-//
-//
-// // import 'info_form_2_register.dart';
-//
-// class UserInfoPage extends StatefulWidget {
-//   final String mobileNumber;
-//   const UserInfoPage({super.key, required this.mobileNumber});
-//
-//   @override
-//   _UserInfoPageState createState() => _UserInfoPageState();
-// }
-//
-// class _UserInfoPageState extends State<UserInfoPage> {
-//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-//   TextEditingController dateController = TextEditingController(text: '');
-//
-//   // We use string for user entered Inputs
-//   String? firstName;
-//   String? middleName;
-//   String? lastName;
-//   DateTime? dateOfBirth;
-//   String? address;
-//   String? state;
-//   String? district;
-//   String? city;
-//   String? pinCode;
-//   String? country;
-//
-//   // FocusNode instances for each of your input fields
-//   final FocusNode firstNameFocus = FocusNode();
-//   final FocusNode middleNameFocus = FocusNode();
-//   final FocusNode lastNameFocus = FocusNode();
-//   final FocusNode dateOfBirthFocus = FocusNode();
-//   final FocusNode addressFocus = FocusNode();
-//   final FocusNode stateFocus = FocusNode();
-//   final FocusNode districtFocus = FocusNode();
-//   final FocusNode cityFocus = FocusNode();
-//   final FocusNode pinCodeFocus = FocusNode();
-//   final FocusNode countryFocus = FocusNode();
-//
-//   //  API to insert users info to Database
-//   Future<void> submitUserInfo() async {
-//     // Construct the request body with user information
-//     // Format the date as "dd-MM-yyyy"
-//     final formattedDate = DateFormat('dd-MM-yyyy').format(dateOfBirth ?? DateTime.now());
-//
-//     // Add All Necessary  keys as given in API With the Values passed by user
-//     Map<String, dynamic> requestBody = {
-//       'mobile': widget.mobileNumber,
-//       'FName': firstName ?? '',
-//       'MName': middleName ?? '',
-//       'LName': lastName ?? '',
-//       'DoB': formattedDate, // Use the formatted date
-//       'Address': address ?? '',
-//       'City': city ?? '',
-//       'State': state ?? '',
-//       'Pincode': pinCode ?? '',
-//     };
-//
-//     // Optional fields (if applicable)
-//     // if (country != null) {
-//     //   requestBody['Country'] = country;
-//     // }
-//     // Print the request body for debugging
-//     if (kDebugMode) {
-//       print('Request Body: $requestBody');
-//     }
-//     // Send the POST request to the API
-//     final response = await http.post(
-//       Uri.parse('https://apip.trifrnd.com/Services/eng/sereng.php?apicall=engreg'),
-//       body: requestBody,
-//     );
-//
-//     if (response.statusCode == 200) {
-//       if (kDebugMode) {
-//         print('API response 0: ${response.statusCode}');
-//       }
-//       // Successful response from the API
-//       // You can handle the response here, e.g., show a success message
-//       if (kDebugMode) {
-//         print('API response we got: ${response.body}');
-//       }
-//
-//       Fluttertoast.showToast(
-//         msg: response.body,
-//         toastLength: Toast.LENGTH_SHORT,
-//         backgroundColor: Colors.green,
-//         textColor: Colors.white,
-//       );
-//       Navigator.of(context).push(
-//         MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: widget.mobileNumber,),
-//         ),
-//       );
-//     }
-//     else {
-//       // Error response from the API
-//       // Handle the error, e.g., show an error message
-//       if (kDebugMode) {
-//         print('API error: ${response.statusCode}, ${response.body}');
-//       }
-//     }
-//
-//   }
-//
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     // Perform any initializations here if needed.
-//   }
-//
-//   // Once user goes to next cell previous cell will Close
-//   @override
-//   void dispose() {
-//     firstNameFocus.dispose();
-//     middleNameFocus.dispose();
-//     lastNameFocus.dispose();
-//     dateOfBirthFocus.dispose();
-//     addressFocus.dispose();
-//     stateFocus.dispose();
-//     districtFocus.dispose();
-//     cityFocus.dispose();
-//     pinCodeFocus.dispose();
-//     countryFocus.dispose();
-//     super.dispose();
-//   }
-//
-//
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return
-//       // MaterialApp(
-//       // home:
-//     Scaffold(
-//         body: SingleChildScrollView(
-//           child: Column(
-//             mainAxisAlignment: MainAxisAlignment.center,
-//             crossAxisAlignment: CrossAxisAlignment.center,
-//             children: [
-//               // const SizedBox(height: 120,),
-//               Text(
-//                 'Personal Information',
-//                 style: TextStyle(
-//                     fontSize: 30,
-//                     color: Colors.teal.shade300,
-//                     fontWeight: FontWeight.bold
-//                 ),
-//               ),
-//               Text("Hello User, Mobile Number: ${widget.mobileNumber}"),
-//
-//               Padding(
-//                 padding:  const EdgeInsets.symmetric(vertical: 30),
-//                 child: Form(
-//                   key: _formKey,
-//                   child: Column(
-//                     children: [
-//
-//                       // Code for Entering First Name
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30,),
-//                         child: TextFormField(
-//                           // controller: _nameController,
-//                           keyboardType: TextInputType.name,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'First Name*',
-//                             hintText: 'Enter Name',
-//                             prefixIcon: Icon(Icons.person),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onSaved: (value) {
-//                             firstName = value;
-//                           },
-//                           onChanged: (String value){
-//                           },
-//                           validator: (value) {
-//                             if (value!.isEmpty) {
-//                               return 'Please enter your Name';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering Middle Name
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _nameController,
-//                           keyboardType: TextInputType.name,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Middle Name*',
-//                             hintText: 'Enter Middle Name',
-//                             prefixIcon: Icon(Icons.person),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onSaved: (value) {
-//                             middleName = value;
-//                           },
-//                           onChanged: (String value){
-//                           },
-//
-//                           validator: (value) {
-//                             if (value!.isEmpty) {
-//                               return 'Please enter your Middle Name';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _nameController,
-//                           keyboardType: TextInputType.name,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Last Name*',
-//                             hintText: 'Enter Last Name',
-//                             prefixIcon: Icon(Icons.person),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onSaved: (value) {
-//                             lastName = value;
-//                           },
-//                           onChanged: (String value){
-//                           },
-//
-//                           validator: (value) {
-//                             if (value!.isEmpty) {
-//                               return 'Please enter your Last Name';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//
-//                       // Code for Date of Birth
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           controller: dateController, // Use the _dateController here
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Date of Birth*',
-//                             hintText: 'Select Date of Birth',
-//                             prefixIcon: Icon(Icons.date_range),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onTap: () async {
-//                             final selectedDate = await showDatePicker(
-//                               context: context,
-//                               initialDate: DateTime.now(),
-//                               firstDate: DateTime(1900),
-//                               lastDate: DateTime.now(),
-//                             );
-//
-//                             if (selectedDate != null) {
-//                               final formattedDate = DateFormat('dd-MM-yyyy').format(selectedDate); // Format the date
-//                               setState(() {
-//                                 dateOfBirth = selectedDate;
-//                                 dateController.text = formattedDate; // Set the formatted date in the text field
-//                               });
-//                             }
-//                           },
-//
-//
-//                           readOnly: true,
-//                           validator: (value) {
-//                             if (dateOfBirth == null) {
-//                               return 'Please select your date of birth';
-//                             }
-//                             return null;
-//                           },
-//                         ),
-//                       ),
-//
-//
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering Address
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _emailController,
-//                           keyboardType: TextInputType.emailAddress,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Address*',
-//                             hintText: 'Enter Address',
-//                             prefixIcon: Icon(Icons.home),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your address';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             address = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering State
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _emailController,
-//                           keyboardType: TextInputType.emailAddress,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'State*',
-//                             hintText: 'Enter State',
-//                             prefixIcon: Icon(FontAwesomeIcons.mapLocationDot),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your state';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             state = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering District
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _emailController,
-//                           keyboardType: TextInputType.emailAddress,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'District*',
-//                             hintText: 'Enter District',
-//                             prefixIcon: Icon(Icons.location_pin),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your district';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             district = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering City
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _emailController,
-//                           keyboardType: TextInputType.emailAddress,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'City*',
-//                             hintText: 'Enter City',
-//                             prefixIcon: Icon(Icons.location_city),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your city';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             city = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering Pin Code
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _mobileController,
-//                           keyboardType: TextInputType.number,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Pin Code*',
-//                             hintText: 'Enter Pin Code',
-//                             prefixIcon: Icon(FontAwesomeIcons.mapPin),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your pin code';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             pinCode = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Entering Country
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 30),
-//                         child: TextFormField(
-//                           // controller: _emailController,
-//                           keyboardType: TextInputType.emailAddress,
-//                           textInputAction: TextInputAction.next, // Set the action
-//                           decoration: const InputDecoration(
-//                             labelText: 'Country*',
-//                             hintText: 'Enter Country',
-//                             prefixIcon: Icon(FontAwesomeIcons.earthAsia),
-//                             border: OutlineInputBorder(),
-//                           ),
-//                           onChanged: (String value){
-//
-//                           },
-//                           validator: (value) {
-//                             if (value == null || value.isEmpty) {
-//                               return 'Please enter your country';
-//                             }
-//                             return null;
-//                           },
-//                           onSaved: (value) {
-//                             country = value;
-//                           },
-//                         ),
-//                       ),
-//                       const SizedBox(height: 25,),
-//
-//                       // Code for Submit Button
-//
-//
-//                       Padding(
-//                         padding: const EdgeInsets.symmetric(horizontal: 35),
-//                         child: MaterialButton(
-//                           minWidth: double.infinity,
-//                           onPressed: () async {
-//                             if (_formKey.currentState!.validate()) {
-//                               _formKey.currentState!.save();
-//                               // called the API Function here
-//                               submitUserInfo(); // Call the function to submit user information
-//
-//                             }
-//                           },
-//                           color: Colors.teal,
-//                           textColor: Colors.white,
-//                           child: const Text(
-//                             'Submit ',
-//                             style: TextStyle(
-//                               fontSize: 16,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       const SizedBox(height: 20,),
-//                     ],
-//                   ),
-//                 ),
-//               )
-//             ],
-//           ),
-//         ),
-//       );
-//     // );
-//   }
-// }
 
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -525,186 +11,155 @@ import 'package:http/http.dart' as http;
 import 'info_form_2_register.dart';
 
 
-
-// import 'info_form_2_register.dart';
-
 class UserInfoPage extends StatefulWidget {
   final String mobileNumber;
   const UserInfoPage({super.key, required this.mobileNumber});
-
   @override
-  _UserInfoPageState createState() => _UserInfoPageState();
+  _RegistrationFormState createState() => _RegistrationFormState();
 }
 
-class _UserInfoPageState extends State<UserInfoPage> {
+class _RegistrationFormState extends State<UserInfoPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController dateController = TextEditingController(text: '');
 
-  // We use string for user entered Inputs
-  String? firstName;
-  String? middleName;
-  String? lastName;
-  DateTime? dateOfBirth;
-  String? address;
-  String? state;
-  String? district;
-  String? city;
-  String? pinCode;
-  String? country;
+  List<Map<String, String>> cities = [];
+  String? selectedState;
+  String? selectedDistrict;
+  String? selectedCity;
 
-  // FocusNode instances for each of your input fields
-  final FocusNode firstNameFocus = FocusNode();
-  final FocusNode middleNameFocus = FocusNode();
-  final FocusNode lastNameFocus = FocusNode();
-  final FocusNode dateOfBirthFocus = FocusNode();
-  final FocusNode addressFocus = FocusNode();
-  final FocusNode stateFocus = FocusNode();
-  final FocusNode districtFocus = FocusNode();
-  final FocusNode cityFocus = FocusNode();
-  final FocusNode pinCodeFocus = FocusNode();
-  final FocusNode countryFocus = FocusNode();
+  // TextEditingController mobileController = TextEditingController();
+  TextEditingController fNameController = TextEditingController();
+  TextEditingController mNameController = TextEditingController();
+  TextEditingController lNameController = TextEditingController();
+  String dob = ''; // Store the selected date
+  TextEditingController addressController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
+  TextEditingController stateController = TextEditingController();
+  TextEditingController districtController = TextEditingController();
+  TextEditingController pincodeController = TextEditingController();
 
-
-  // In StepperPage
-  // void showMessageBox() {
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         title: Text("Message"),
-  //         content: Text("User Register Successfully. \n\n Go To Next Page"),
-  //         actions: <Widget>[
-  //           TextButton(
-  //             child: Text("OK"),
-  //             onPressed: () {
-  //               Navigator.of(context).pop();
-  //               // Navigate to Step 2
-  //               // _onStepTapped(1); // Assuming Step 2 is at index 1
-  //             },
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
-  //  API to insert users info to Database
-  Future<void> submitUserInfo() async {
-    // Construct the request body with user information
-    // Format the date as "dd-MM-yyyy"
-    final formattedDate = DateFormat('yyyy-dd-MM').format(dateOfBirth ?? DateTime.now());
-
-    // Add All Necessary  keys as given in API With the Values passed by user
-    Map<String, dynamic> requestBody = {
-      'mobile': widget.mobileNumber,
-      'FName': firstName ?? '',
-      'MName': middleName ?? '',
-      'LName': lastName ?? '',
-      'DoB': formattedDate, // Use the formatted date
-      'Address': address ?? '',
-      'City': city ?? '',
-      'State': state ?? '',
-      'District': district ?? '',
-      'Pincode': pinCode ?? '',
-    };
-
-    // Optional fields (if applicable)
-    // if (country != null) {
-    //   requestBody['Country'] = country;
-    // }
-    // Print the request body for debugging
-    if (kDebugMode) {
-      print('Request Body: $requestBody');
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      // If the form is valid, send data to the API
+      sendUserDataToAPI();
     }
-    // Send the POST request to the API
-    final response = await http.post(
-      Uri.parse('https://apip.trifrnd.com/Services/eng/sereng.php?apicall=engreg'),
-      body: requestBody,
-    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchListData();
+  }
+
+  Future<void> fetchListData() async {
+    final response = await http.get(
+        Uri.parse('https://apip.trifrnd.com/services/eng/sereng.php?apicall=readcities'));
 
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('API response 0: ${response.statusCode}');
-      }
-      // Successful response from the API
-      // You can handle the response here, e.g., show a success message
-      if (kDebugMode) {
-        print('API response we got: ${response.body}');
-      }
+      final List<dynamic> data = json.decode(response.body);
+      List<Map<String, String>> cityList = data
+          .map((item) => Map<String, String>.from(item))
+          .toList();
+      setState(() {
+        cities = cityList;
+      });
+    } else {
+      throw Exception('Failed to load data');
+    }
+  }
 
+  List<String?> getStates() {
+    return cities.map((city) => city['State']).toSet().toList();
+  }
+
+  List<String?> getDistricts() {
+    if (selectedState == null) return [];
+    return cities
+        .where((city) => city['State'] == selectedState)
+        .map((city) => city['District'])
+        .toSet()
+        .toList();
+  }
+
+  List<String?> getCities() {
+    if (selectedDistrict == null) return [];
+    return cities
+        .where((city) =>
+    city['State'] == selectedState && city['District'] == selectedDistrict)
+        .map((city) => city['City'])
+        .toList();
+  }
+
+
+
+  Future<void> sendUserDataToAPI() async {
+    final url = Uri.parse(
+        'https://apip.trifrnd.com/Services/eng/sereng.php?apicall=engreg');
+
+    final response = await http.post(url, body: {
+      'mobile': widget.mobileNumber,
+      'FName': fNameController.text,
+      'MName': mNameController.text,
+      'LName': lNameController.text,
+      'DoB': dob, // Use the selected date
+      'Address': addressController.text,
+      'City': selectedCity,
+      'State': selectedState,
+      'District': selectedDistrict,
+      'Pincode': pincodeController.text,
+    });
+
+    if (response.statusCode == 200) {
+      // Successfully sent data to the API
+      print(response.statusCode);
+      print(response.body);
+
+      print('Data sent successfully');
       Fluttertoast.showToast(
         msg: response.body,
         toastLength: Toast.LENGTH_SHORT,
         backgroundColor: Colors.green,
         textColor: Colors.white,
       );
-      void showMessageBox() {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text("Message"),
-              content: Text("${response.body} \n\n Go To Next Page"),
-              actions: <Widget>[
-                TextButton(
-                  child: Text("OK"),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    // Navigate to Step 2
-                    // _onStepTapped(1); // Assuming Step 2 is at index 1
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      }
-
-      showMessageBox();
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: widget.mobileNumber,),
-      //   ),
-      // );
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: widget.mobileNumber,),),
+      );
+      // You can add code here to handle a successful response
+    } else {
+      // Handle errors
+      print('Error sending data to the API: ${response.statusCode}');
+      // You can add code here to handle API errors
     }
-    else {
-      // Error response from the API
-      // Handle the error, e.g., show an error message
-      if (kDebugMode) {
-        print('API error: ${response.statusCode}, ${response.body}');
-      }
+  }
+
+
+
+
+
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        dob = "${picked.year}-${picked.month}-${picked.day}";
+      });
     }
-
   }
-
-
-  @override
-  void initState() {
-    super.initState();
-    // Perform any initializations here if needed.
-  }
-
-  // Once user goes to next cell previous cell will Close
-  @override
-  void dispose() {
-    firstNameFocus.dispose();
-    middleNameFocus.dispose();
-    lastNameFocus.dispose();
-    dateOfBirthFocus.dispose();
-    addressFocus.dispose();
-    stateFocus.dispose();
-    districtFocus.dispose();
-    cityFocus.dispose();
-    pinCodeFocus.dispose();
-    countryFocus.dispose();
-    super.dispose();
-  }
-
-
 
   @override
   Widget build(BuildContext context) {
-    return
-      Scaffold(
+    return Scaffold(
+      // appBar: AppBar(
+      //   backgroundColor: Colors.teal,
+      //   centerTitle: true,
+      //   title: const Text(
+      //     'Personal Inforamtion',
+      //     style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      //   ),
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding:  const EdgeInsets.symmetric(vertical: 30),
@@ -714,7 +169,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // const SizedBox(height: 110,),
+                const SizedBox(height: 20,),
                 Text(
                   'Personal Information',
                   style: TextStyle(
@@ -724,85 +179,82 @@ class _UserInfoPageState extends State<UserInfoPage> {
                   ),
                 ),
                 Text("Hello User, Mobile Number: ${widget.mobileNumber}"),
-
                 const SizedBox(height: 30),
 
-                // Code for Entering Pan Number
+
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _nameController,
+                    controller: fNameController,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'First Name*',
-                      hintText: 'Enter Name',
+                      hintText: 'First Name',
                       prefixIcon: Icon(Icons.person),
                       border: OutlineInputBorder(),
                     ),
-                    onSaved: (value) {
-                      firstName = value;
-                    },
-                    onChanged: (String value){
-                    },
+
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Please enter your Name';
+                        return 'Please enter your first name';
                       }
                       return null;
                     },
                   ),
                 ),
-                const SizedBox(height: 25),
-                // Code for Entering Aadhar Card Number
+                // TextFormField(
+                //   controller: fNameController,
+                //   decoration: InputDecoration(labelText: 'First Name'),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your first name';
+                //     }
+                //     return null;
+                //   },
+                // ),
+
+
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _nameController,
+                    controller: mNameController,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'Middle Name*',
-                      hintText: 'Enter Middle Name',
+                      hintText: 'Middle Name',
                       prefixIcon: Icon(Icons.person),
                       border: OutlineInputBorder(),
                     ),
-                    onSaved: (value) {
-                      middleName = value;
-                    },
-                    onChanged: (String value){
-                    },
 
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Please enter your Middle Name';
+                        return 'Please enter your Middle name';
                       }
                       return null;
                     },
                   ),
                 ),
-                const SizedBox(height: 25),
-
-                // Code for Entering Last Education
-
+                // TextFormField(
+                //   controller: mNameController,
+                //   decoration: InputDecoration(labelText: 'Middle Name'),
+                // ),
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _nameController,
+                    controller: lNameController,
                     keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'Last Name*',
-                      hintText: 'Enter Last Name',
+                      hintText: 'Last Name',
                       prefixIcon: Icon(Icons.person),
                       border: OutlineInputBorder(),
                     ),
-                    onSaved: (value) {
-                      lastName = value;
-                    },
-                    onChanged: (String value){
-                    },
 
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -812,230 +264,259 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     },
                   ),
                 ),
-                const SizedBox(height: 25),
+                // TextFormField(
+                //   controller: lNameController,
+                //
+                //   decoration: InputDecoration(labelText: 'Last Name'),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your last name';
+                //     }
+                //     return null;
+                //   },
+                // ),
+                const SizedBox(height: 30),
 
-                // Code for Entering Last Education Year
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: TextFormField(
-                    controller: dateController, // Use the _dateController here
-                    textInputAction: TextInputAction.next, // Set the action
-                    decoration: const InputDecoration(
-                      labelText: 'Date of Birth*',
-                      hintText: 'Select Date of Birth',
-                      prefixIcon: Icon(Icons.date_range),
-                      border: OutlineInputBorder(),
+                Card(
+                  elevation: 1, // Adjust the elevation if desired
+                  child: Container(
+                    width: 320,
+                    height: 60,
+                    // Adjust the width as needed
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey, // Border color
+                        width: 1.0,          // Border width
+                      ),
+                      borderRadius: BorderRadius.circular(3.0), // Border radius
                     ),
-                    onTap: () async {
-                      final selectedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
-                      );
-
-                      if (selectedDate != null) {
-                        final formattedDate = DateFormat('yyyy-dd-MM').format(selectedDate); // Format the date
-                        setState(() {
-                          dateOfBirth = selectedDate;
-                          dateController.text = formattedDate; // Set the formatted date in the text field
-                        });
-                      }
-                    },
-
-
-                    readOnly: true,
-
-                    validator: (value) {
-                      if (dateOfBirth == null) {
-                        return 'Please select your date of birth';
-                      }
-                      return null;
-                    },
+                    child: ListTile(
+                      leading: const Icon(Icons.calendar_today, color: Colors.blue), // Icon
+                      title: const Text(
+                        'Date of Birth',
+                        style: TextStyle(fontSize: 18.0),
+                      ),
+                      subtitle: Text(dob),
+                      onTap: () => _selectDate(context),
+                    ),
                   ),
                 ),
-                const SizedBox(height: 25),
+                // const SizedBox(height: 30),
 
-                // Code for Entering Work Experience
+                //   ListTile(
+                //   title: Text(
+                //     'Date of Birth',
+                //     style: TextStyle(fontSize: 18.0),
+                //   ),
+                //   subtitle: Text(dob),
+                //   onTap: () => _selectDate(context),
+                // ),
 
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    controller: addressController,
+                    keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'Address*',
-                      hintText: 'Enter Address',
+                      hintText: 'Address',
                       prefixIcon: Icon(Icons.home),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
 
-                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
+                      if (value!.isEmpty) {
                         return 'Please enter your address';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      address = value;
-                    },
                   ),
                 ),
-                const SizedBox(height: 25),
-
-                // Code for Entering Bank Name
+                // TextFormField(
+                //   controller: addressController,
+                //   decoration: InputDecoration(labelText: 'Address'),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your address';
+                //     }
+                //     return null;
+                //   },
+                // ),
+                const SizedBox(height: 30),
 
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: TextFormField(
-                    // controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next, // Set the action
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
+                  child: DropdownButtonFormField<String?>(
+                    value: selectedState,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedState = newValue;
+                        selectedDistrict = null;
+                        selectedCity = null;
+                      });
+                    },
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('Select State'),
+                      ),
+                      ...getStates().map((state) => DropdownMenuItem<String?>(
+                        value: state,
+                        child: Text(state ?? ""),
+                      )),
+                    ],
                     decoration: const InputDecoration(
                       labelText: 'State*',
-                      hintText: 'Enter State',
                       prefixIcon: Icon(FontAwesomeIcons.mapLocationDot),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
-
-                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your state';
+                      if (value == null) {
+                        return 'Please select a state';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      state = value;
-                    },
+                    // onChanged: (newValue) {
+                    //   // Handle state change here
+                    // },
                   ),
                 ),
-                const SizedBox(height: 25),
 
-                // Code for Entering Bank Account Number
-
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: TextFormField(
-                    // controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next, // Set the action
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
+                  child: DropdownButtonFormField<String?>(
+                    value: selectedDistrict,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedDistrict = newValue;
+                        selectedCity = null;
+                      });
+                    },
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('Select District'),
+                      ),
+                      ...getDistricts().map((district) => DropdownMenuItem<String?>(
+                        value: district,
+                        child: Text(district ?? ""),
+                      )),
+                    ],
                     decoration: const InputDecoration(
                       labelText: 'District*',
-                      hintText: 'Enter District',
                       prefixIcon: Icon(Icons.location_pin),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
-
-                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your district';
+                      if (value == null) {
+                        return 'Please select a district';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      district = value;
-                    },
                   ),
                 ),
-                const SizedBox(height: 25),
-
-                // Code for Entering Bank IFSC Code
-
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: TextFormField(
-                    // controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next, // Set the action
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
+                  child: DropdownButtonFormField<String?>(
+                    value: selectedCity,
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedCity = newValue;
+                      });
+                    },
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        
+                        child: Text('Select City'),
+                      ),
+                      ...getCities().map((city) => DropdownMenuItem<String?>(
+                        value: city,
+                        child: Text(city ?? ""),
+                      )),
+                    ],
                     decoration: const InputDecoration(
                       labelText: 'City*',
-                      hintText: 'Enter City',
                       prefixIcon: Icon(Icons.location_city),
+
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
-
-                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your city';
+                      if (value == null) {
+                        return 'Please select a city';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      city = value;
-                    },
                   ),
                 ),
-                const SizedBox(height: 25),
+                // const SizedBox(height: 30),
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _mobileController,
+                    controller: pincodeController,
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
-                      labelText: 'Pin Code*',
-                      hintText: 'Enter Pin Code',
+                      labelText: 'Pincode*',
+                      hintText: 'Pincode',
                       prefixIcon: Icon(FontAwesomeIcons.mapPin),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
 
-                    },
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your pin code';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      pinCode = value;
-                    },
+                      validator: (value) {
+                        final sanitizedValue = value?.replaceAll(" ", "");
+                        if (sanitizedValue == null || sanitizedValue.isEmpty) {
+                          return 'Please enter your Pincode';
+                        } else if (sanitizedValue.length != 6 || !sanitizedValue.contains(RegExp(r'^[0-9]*$'))) {
+                          return 'Please enter a valid 6-digit Pincode';
+                        }
+                        return null;
+                      },
+
                   ),
                 ),
-                const SizedBox(height: 25,),
-
-                // Code for Entering Country
-
+                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 30,),
                   child: TextFormField(
-                    // controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
+                    keyboardType: TextInputType.name,
                     textInputAction: TextInputAction.next, // Set the action
                     decoration: const InputDecoration(
                       labelText: 'Country*',
-                      hintText: 'Enter Country',
+                      hintText: 'Country',
                       prefixIcon: Icon(FontAwesomeIcons.earthAsia),
                       border: OutlineInputBorder(),
                     ),
-                    onChanged: (String value){
 
-                    },
                     validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your country';
+                      if (value!.isEmpty) {
+                        return 'Please enter your Country Name';
                       }
                       return null;
                     },
-                    onSaved: (value) {
-                      country = value;
-                    },
                   ),
                 ),
+                // TextFormField(
+                //   controller: pincodeController,
+                //   decoration: InputDecoration(labelText: 'Pincode'),
+                //   validator: (value) {
+                //     if (value!.isEmpty) {
+                //       return 'Please enter your pincode';
+                //     }
+                //     return null;
+                //   },
+                // ),
+                // ElevatedButton(
+                //   onPressed: _submitForm,
+                //   child: Text('Submit'),
+                // ),
                 const SizedBox(height: 25,),
-
-                // Code for Submit Button
-
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -1044,7 +525,7 @@ class _UserInfoPageState extends State<UserInfoPage> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        submitUserInfo();
+                        _submitForm();
                         // Perform form submission here
                         // You can access the form field values like firstName, lastName, etc.
                       }
@@ -1069,4 +550,3 @@ class _UserInfoPageState extends State<UserInfoPage> {
     );
   }
 }
-

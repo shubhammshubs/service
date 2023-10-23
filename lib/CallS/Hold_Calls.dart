@@ -3,6 +3,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:service/Screens/Home_screen.dart';
+import 'package:flutter/scheduler.dart';
 
 import '../API/Update_status_call_inAccepted.dart';
 import '../Widgets/NavBar.dart';
@@ -11,6 +12,8 @@ import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 class HoldCalls extends StatefulWidget {
   final String mobileNumber;
+  static const String routeName = '/hold_calls'; // Define a route name
+
 
   HoldCalls({required this.mobileNumber});
 
@@ -19,7 +22,7 @@ class HoldCalls extends StatefulWidget {
 }
 
 class _HoldCallsState extends State<HoldCalls> {
-  late BuildContext myContext;
+  // late BuildContext myContext;
 
   List<Map<String, dynamic>> apiDataList = [];
   double screenHeight = 0;
@@ -73,6 +76,9 @@ class _HoldCallsState extends State<HoldCalls> {
   }
   // For Take ACtion Button
   void showUpdateDialog(BuildContext context, String callId) {
+
+    final NavigatorState navigatorState = Navigator.of(context);
+
     String selectedStatus = 'Hold';
     String remark = '';
 
@@ -128,11 +134,23 @@ class _HoldCallsState extends State<HoldCalls> {
         // After updating, fetch the data again to reflect the changes
         fetchData();
 
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => HoldCalls(mobileNumber: widget.mobileNumber),
-          ),
-        );
+        // Navigator.of(context).pushReplacement(
+        //   MaterialPageRoute(
+        //     builder: (context) => HoldCalls(mobileNumber: widget.mobileNumber),
+        //   ),
+        // );
+
+        // Wrap Navigator with SchedulerBinding to wait for rendering state before navigating
+        // SchedulerBinding.instance.addPostFrameCallback((_) {
+        //   Navigator.of(context).pushReplacementNamed(HoldCalls(mobileNumber: widget.mobileNumber).routeName);
+        // });
+
+        // SchedulerBinding.instance.addPostFrameCallback((_) {
+        //   Navigator.of(context).pushReplacementNamed(HoldCalls.routeName);
+        // });
+
+        // navigatorState.pushReplacementNamed(HoldCalls(mobileNumber: widget.mobileNumber) as String);
+
 
         Navigator.of(context).pop();
       }
@@ -151,10 +169,6 @@ class _HoldCallsState extends State<HoldCalls> {
         //   isLoading = false; // Hide the loading symbol
         // });
       }
-
-
-
-
     }
 
     showDialog(
@@ -244,7 +258,6 @@ class _HoldCallsState extends State<HoldCalls> {
                 //   ),
                 // );
               },
-              // onPressed: handleUpdate,
             ),
           ],
         );
