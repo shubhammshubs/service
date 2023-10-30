@@ -290,7 +290,7 @@ class _DisplayAcceptedCall extends State<DisplayAcceptedCall> {
                 const SizedBox(height: 10,),
                 Row(
                   children: [
-                    const SizedBox(width: 1), // Add some spacing between the icon and text
+                    const SizedBox(width: 1),
 
                     Icon(
                       Icons.call, // You can use any desired icon from the Icons class

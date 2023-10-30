@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 import '../Widgets/NavBar.dart';
+import '../Widgets/data_provider.dart';
 
 class CompletedCalls extends StatefulWidget {
   final String mobileNumber;
@@ -37,6 +39,9 @@ class _CompletedCallsState extends State<CompletedCalls> {
         setState(() {
           apiDataList = dataList;
         });
+
+
+
       } else {
         throw Exception('API response is empty');
       }
@@ -46,6 +51,7 @@ class _CompletedCallsState extends State<CompletedCalls> {
   }
 
   void _showDetailsDialog(Map<String, dynamic> item) {
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -387,6 +393,7 @@ class _CompletedCallsState extends State<CompletedCalls> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    int itemCount = apiDataList.length; // Get the count of items in apiDataList
 
     return Scaffold(
       appBar: AppBar(
@@ -484,9 +491,9 @@ class _CompletedCallsState extends State<CompletedCalls> {
                     ],
                   );
                 }).toList(),
-              )
-              ,
+              ),
             ],
+
           ),
         ),
       ),

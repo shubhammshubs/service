@@ -2,8 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../API/Display_Image.dart';
 import '../API/Personal_Information_APi.dart';
+import '../API/Registered_info_Display.dart';
 import '../CallS/New_Calls.dart';
+import '../Servicess/User_Info_From_Register.dart';
 import '../Servicess/User_info_form_display.dart';
 import '../Widgets/DraftTest2.dart';
 import '../user_credientials/info_form.dart';
@@ -22,12 +25,28 @@ class UserProfileScreen extends StatefulWidget {
 class _UserProfileScreenState extends State<UserProfileScreen> {
   ApiProvider apiProvider = ApiProvider();
   UserProfile? userProfile;
+  UserRegisterInfo? userRegisterInfo;
+  String email = '';
 
   @override
   void initState() {
     super.initState();
+    fetchData();
     fetchUserProfile();
   }
+
+  Future<void> fetchData() async {
+    // Call the API service to get user data
+    final userRegData = await ApiRegiserDisplayService.getUserInfo(widget.mobileNumber);
+
+    if (userRegData != null) {
+      setState(() {
+        email = userRegData['email'];
+        // status = userData['status'] ?? 'Status not available';
+      });
+    }
+  }
+
 
   void fetchUserProfile() async {
     try {
@@ -55,7 +74,10 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       body: Center(
         child: userProfile == null
             ? CircularProgressIndicator()
-            : UserProfileWidget(userProfile: userProfile!, mobileNumber: widget.mobileNumber,),
+            : UserProfileWidget(userProfile: userProfile!, mobileNumber: widget.mobileNumber,
+          email: email, // Pass the email parameter
+        ),
+
       ),
     );
   }
@@ -63,9 +85,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 class UserProfileWidget extends StatelessWidget {
   final UserProfile userProfile;
   final String mobileNumber;
+  final String email; // Add the email parameter
+
+  // final UserRegisterInfo userRegisterInfo;
   double screenHeight = 0;
   double screenWidth = 0;
-  UserProfileWidget({super.key, required this.userProfile, required this.mobileNumber});
+
+  UserProfileWidget({super.key,
+    required this.userProfile,
+    required this.email, // Add the email parameter
+
+    required this.mobileNumber,
+    // required this.userRegisterInfo
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +121,8 @@ class UserProfileWidget extends StatelessWidget {
                   alignment: Alignment.center,
                   child: Column(
                     children: [
-                      CircularImage(),
+                      CircularImage(mobileNumber: mobileNumber,),
+                      const SizedBox(height: 12,),
                       Text(
                         '${userProfile.fName} ${userProfile.mName ?? ""} ${userProfile.lName}', // Replace with the desired name
                         style: const TextStyle(
@@ -98,8 +131,10 @@ class UserProfileWidget extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 12,),
-                      const Text(
-                        'email: User@gmail.com', // Replace with the desired name
+                       Text(
+                         'Email: $email',
+                             // '?? "N/A"',
+                         // Replace with the desired name
                         style: TextStyle(
                           fontSize: 16.0,
                           fontWeight: FontWeight.bold,
@@ -333,128 +368,6 @@ class UserProfileWidget extends StatelessWidget {
                             fontWeight: FontWeight.bold
                         ),
                       ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => DisplayDistrictPage(district: userProfile.district),
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: Text(
-                      //     '${userProfile.district}',
-                      //     style: const TextStyle(
-                      //       fontSize: 13.0,
-                      //       fontWeight: FontWeight.bold,
-                      //     ),
-                      //   ),
-                      // ),
-                      // GestureDetector(
-                      //   onTap: () {
-                      //     Navigator.push(
-                      //       context,
-                      //       MaterialPageRoute(
-                      //         builder: (context) => DisplayDistrictPage(district: userProfile.district),
-                      //       ),
-                      //     );
-                      //   },
-                      //   child: Text(
-                      //     '${userProfile.district}',
-                      //     style: const TextStyle(
-                      //       fontSize: 13.0,
-                      //       fontWeight: FontWeight.bold,
-                      //     ),
-                      //   ),
-                      // )
-
-
-                      // Container(
-                      //   margin: const EdgeInsets.only(top: 20),
-                      //   width: screenWidth,
-                      //   decoration: BoxDecoration(
-                      //     border: Border.all(
-                      //       color: Colors.black, // Border color
-                      //       width: 1.0, // Border width
-                      //     ),
-                      //     borderRadius: BorderRadius.circular(20), // Border radius
-                      //   ),
-                      //   child: Container(
-                      //     padding: const EdgeInsets.all(16.0), // Padding within the border
-                      //     child:
-                      //         Column(
-                      //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //           children: [
-                      //             Row(
-                      //               children: [
-                      //                 Container(
-                      //                   margin: const EdgeInsets.only(top: 20),
-                      //                   width: 160,
-                      //                   decoration: BoxDecoration(
-                      //                     border: Border.all(
-                      //                       color: Colors.black, // Border color
-                      //                       width: 1.0, // Border width
-                      //                     ),
-                      //                     borderRadius: BorderRadius.circular(20), // Border radius
-                      //                   ),
-                      //
-                      //                   child: Container(
-                      //                     padding: const EdgeInsets.all(16.0), // Padding within the border
-                      //                     child: Row(
-                      //                         children: <Widget>[
-                      //                           const Icon(FontAwesomeIcons.mapPin, // Icon you want to use
-                      //                             color: Colors.teal, // Icon color
-                      //                           ),
-                      //                           const SizedBox(width: 8),
-                      //                           Text(
-                      //                             '${userProfile.state}',
-                      //                             style: const TextStyle(
-                      //                               fontSize: 13.0,
-                      //                               fontWeight: FontWeight.bold,
-                      //                             ),
-                      //                           ),
-                      //                         ]
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //                 const SizedBox(width: 16),
-                      //
-                      //                 Container(
-                      //                   margin: const EdgeInsets.only(top: 20),
-                      //                   width: 160,
-                      //                   decoration: BoxDecoration(
-                      //                     border: Border.all(
-                      //                       color: Colors.black, // Border color
-                      //                       width: 1.0, // Border width
-                      //                     ),
-                      //                     borderRadius: BorderRadius.circular(20), // Border radius
-                      //                   ),
-                      //                   child: Container(
-                      //                     padding: const EdgeInsets.all(16.0), // Padding within the border
-                      //                     child: Row(
-                      //                         children: <Widget>[
-                      //                           const Icon(FontAwesomeIcons.mapPin, // Icon you want to use
-                      //                             color: Colors.teal, // Icon color
-                      //                           ),
-                      //                           const SizedBox(width: 8),
-                      //                           Text(
-                      //                             '${userProfile.state}',
-                      //                             style: const TextStyle(
-                      //                               fontSize: 13.0,
-                      //                               fontWeight: FontWeight.bold,
-                      //                             ),
-                      //                           ),
-                      //                         ]
-                      //                     ),
-                      //                   ),
-                      //                 ),
-                      //               ],
-                      //             )
-                      //           ],
-                      //         )
-                      //
-                      //   ),
-                      // ),
                     ],
                   ),
                 ),
@@ -467,42 +380,31 @@ class UserProfileWidget extends StatelessWidget {
   }
 }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return
-  //     Column(
-  //     mainAxisAlignment: MainAxisAlignment.center,
-  //     crossAxisAlignment: CrossAxisAlignment.center,
-  //     children: <Widget>[
-  //       // Text("Hello User, Mobile Number: ${widget.mobileNumber}"),
-  //
-  //       Container(
-  //         padding: const EdgeInsets.symmetric(horizontal: 30),
-  //         decoration: BoxDecoration(
-  //           border: Border.all(
-  //             color: Colors.black, // Border color
-  //             width: 2.0,           // Border width
-  //           ),
-  //           borderRadius: BorderRadius.circular(60), // Border radius
-  //         ),
-  //         child: Text('First Name: ${userProfile.fName}'),
-  //       ),
-  //       const SizedBox(height: 25),
-  //
-  //       Text('Middle Name: ${userProfile.mName ?? "N/A"}'), // Use "N/A" if middle name is null
-  //       Text('Last Name: ${userProfile.lName}'),
-  //
-  //       Text('DOB: ${userProfile.dob ?? "N/A"}'), // Use "N/A" if date of birth is null
-  //       Text('Address: ${userProfile.address}'),
-  //       Text('District: ${userProfile.district}'),
-  //       Text('City: ${userProfile.city}'),
-  //       Text('Pincode: ${userProfile.pincode}'),
-  //       Text('State: ${userProfile.state}'),
-  //     ],
-  //   );
-  // }
 
-class CircularImage extends StatelessWidget {
+class CircularImage extends StatefulWidget {
+  final String mobileNumber;
+  CircularImage({required this.mobileNumber});
+
+  @override
+  State<CircularImage> createState() => _CircularImageState();
+}
+
+class _CircularImageState extends State<CircularImage> {
+  String? imageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    loadImage();
+
+  }
+
+  // This is code is for Displaying the Image Fetched for Display
+  Future<void> loadImage() async {
+    imageUrl = await fetchImageUrl(widget.mobileNumber); // Replace with your mobile number
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return
@@ -521,11 +423,11 @@ class CircularImage extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
 
-                    Image.asset(
-                      'assets/image/splash.png', // Replace with the path to your image
-                      width: 300, // Adjust the size of the enlarged image
+                    Image.network(
+                      imageUrl!,
+                      width: 300,
                       height: 200,
-
+                      // fit: BoxFit.cover,
                     ),
                     // Text('User Profile Picture'),
                   ],
@@ -548,11 +450,13 @@ class CircularImage extends StatelessWidget {
         },
       );
     },
-    child: const CircleAvatar(
-    radius: 55, // Adjust the size of the image as needed
-    backgroundImage: AssetImage('assets/image/splash.png',),
-      backgroundColor: Colors.white,
-    ),
+          child: imageUrl != null
+              ? CircleAvatar(
+            radius: 55,
+            backgroundColor: Colors.white,
+            backgroundImage: NetworkImage(imageUrl!), // Use NetworkImage to load an image from a URL
+          )
+              : Text("Image not found"),
     ),
       );
   }

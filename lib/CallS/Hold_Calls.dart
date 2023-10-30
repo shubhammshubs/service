@@ -30,6 +30,7 @@ class _HoldCallsState extends State<HoldCalls> {
   bool isLoading = false; // Add this variable
   bool _isMounted = false; // Add this variable
 
+  int callOnHoldCount = 0; // Variable to store the count
 
 
   @override
@@ -44,6 +45,9 @@ class _HoldCallsState extends State<HoldCalls> {
     _isMounted = false; // Widget is no longer mounted
     super.dispose();
   }
+
+
+
 
   void fetchData() async {
     final response = await http.post(
@@ -136,7 +140,7 @@ class _HoldCallsState extends State<HoldCalls> {
 
         // Navigator.of(context).pushReplacement(
         //   MaterialPageRoute(
-        //     builder: (context) => HoldCalls(mobileNumber: widget.mobileNumber),
+        //     builder: (context) => HomePage(mobileNumber: widget.mobileNumber),
         //   ),
         // );
 
@@ -751,7 +755,6 @@ class _HoldCallsState extends State<HoldCalls> {
           ),
         ),
       ),
-      // ... Your UI code remains the same
     );
   }
 }

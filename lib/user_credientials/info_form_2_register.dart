@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 // import 'package:service/user_credientials/user_documents_page.dart';
 import 'package:http/http.dart' as http;
+import 'package:service/Screens/Home_screen.dart';
 import 'package:service/user_credientials/user_documents_page.dart';
 
 class registerInfoPage extends StatefulWidget {
@@ -140,7 +141,9 @@ class _registerInfoPage extends State<registerInfoPage> {
       //   );
       // }
       Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),),
+        MaterialPageRoute(builder: (context) =>
+            HomePage(mobileNumber: widget.mobileNumber,),),
+            // DocumentUploadPage(mobileNumber: widget.mobileNumber,),),
       );
       // showMessageBox();
       // Navigator.of(context).push(

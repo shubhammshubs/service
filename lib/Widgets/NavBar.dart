@@ -8,6 +8,9 @@ import 'package:service/user_credientials/loginpage.dart';
 import 'package:service/user_credientials/user_documents_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../API/Display_Image.dart';
+import '../API/Personal_Information_APi.dart';
+import '../API/Registered_info_Display.dart';
 import '../CallS/Accepted_Calls.dart';
 import '../CallS/Hold_Calls.dart';
 import '../CallS/InProcess_Calls.dart';
@@ -15,14 +18,50 @@ import '../CallS/Incomplete_Calls.dart';
 import '../CallS/New_Calls.dart';
 import '../Screens/Home_screen.dart';
 import '../Screens/Profile_Screen.dart';
+import '../Servicess/User_info_form_display.dart';
 import '../draftTest.dart';
 import '../main.dart';
 import 'DraftTest2.dart';
 
-class NavBar extends StatelessWidget {
+class NavBar extends StatefulWidget {
   final String mobileNumber;
   NavBar({required this.mobileNumber});
+
+  @override
+  State<NavBar> createState() => _NavBarState();
+}
+
+class _NavBarState extends State<NavBar> {
+  String? imageUrl;
+
   // const NavBar({super.key});
+  String username = '';
+
+
+  @override
+  void initState() {
+    super.initState();
+    loadImage();
+    // Fetch user data when the widget is initialized
+    fetchData();
+  }
+  Future<void> loadImage() async {
+    imageUrl = await fetchImageUrl(widget.mobileNumber); // Replace with your mobile number
+    setState(() {});
+  }
+
+  Future<void> fetchData() async {
+    // Call the API service to get user data
+    final userRegData = await ApiRegiserDisplayService.getUserInfo(widget.mobileNumber);
+
+    if (userRegData != null) {
+      setState(() {
+        username = userRegData['username'];
+        // status = userData['status'] ?? 'Status not available';
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,11 +101,11 @@ class NavBar extends StatelessWidget {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
 
-                                      Image.asset(
-                                        'assets/image/splash.png', // Replace with the path to your image
-                                        width: 200, // Adjust the size of the enlarged image
+                                      Image.network(
+                                        imageUrl!,
+                                        width: 200,
                                         height: 200,
-
+                                        // fit: BoxFit.cover,
                                       ),
                                       // Text('User Profile Picture'),
                                     ],
@@ -89,15 +128,18 @@ class NavBar extends StatelessWidget {
                           },
                         );
                       },
-                      child: const CircleAvatar(
-                        radius: 45, // Adjust the size of the image as needed
-                        backgroundImage: AssetImage('assets/image/splash.png'),
-                      ),
+                      child: imageUrl != null
+                          ? CircleAvatar(
+                        radius: 45,
+                        backgroundColor: Colors.white,
+                        backgroundImage: NetworkImage(imageUrl!), // Use NetworkImage to load an image from a URL
+                      )
+                          : Text("Image not found"),
                     ),
 
                   ),
                   // Account name and email
-                  const Positioned(
+                   Positioned(
                     top: 145.0, // Adjust the top position as needed
                     left: 100.0, // Adjust the left position as needed
                     child: Column(
@@ -111,13 +153,16 @@ class NavBar extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        Text(
-                          'user@gmail.com',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14.0,
-                          ),
-                        ),
+
+                    // Display the user name by fetching the fetchData API
+                    Text(
+                      username ,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.0,
+                      ),
+                    ),
+
                       ],
                     ),
                   ),
@@ -129,16 +174,25 @@ class NavBar extends StatelessWidget {
             title: const Text('Dashboard'),
             onTap: () {
               Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => HomePage(mobileNumber: mobileNumber,),)
+                  MaterialPageRoute(builder: (context) => HomePage(mobileNumber: widget.mobileNumber,),)
               );
             }
           ),
+            // ListTile(
+            //     leading: const Icon(Icons.dashboard),
+            //     title: const Text('Example'),
+            //     onTap: () {
+            //       Navigator.of(context).push(
+            //           MaterialPageRoute(builder: (context) => UserProfilePage(mobileNumber: widget.mobileNumber,),)
+            //       );
+            //     }
+            // ),
             ListTile(
                 leading: const Icon(Icons.perm_contact_cal_outlined),
                 title: const Text('Show Profile'),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => UserProfileScreen(mobileNumber: mobileNumber, ),)
+                      MaterialPageRoute(builder: (context) => UserProfileScreen(mobileNumber: widget.mobileNumber, ),)
                   );
                 }
             ),
@@ -177,7 +231,7 @@ class NavBar extends StatelessWidget {
 
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => UserInfoPage(mobileNumber: mobileNumber,),),
+                    MaterialPageRoute(builder: (context) => UserInfoPage(mobileNumber: widget.mobileNumber,),),
                   );
                   // Handle Information sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
@@ -189,23 +243,23 @@ class NavBar extends StatelessWidget {
                 title: const Text('Registration'),
                 onTap: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: mobileNumber,),),
+                    MaterialPageRoute(builder: (context) => registerInfoPage(mobileNumber: widget.mobileNumber,),),
                   );
                   // Handle Registration sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.arrow_right),
-                title: const Text('Documents'),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: mobileNumber,),),
-                  );
-                  // Handle Documents sub-menu item click
-                  // Navigator.of(context).pop(); // Close the drawer if needed
-                },
-              ),
+              // ListTile(
+              //   leading: const Icon(Icons.arrow_right),
+              //   title: const Text('Documents'),
+              //   onTap: () {
+              //     Navigator.of(context).push(
+              //       MaterialPageRoute(builder: (context) => DocumentUploadPage(mobileNumber: widget.mobileNumber,),),
+              //     );
+              //     // Handle Documents sub-menu item click
+              //     // Navigator.of(context).pop(); // Close the drawer if needed
+              //   },
+              // ),
             ],
           ),
           const ListTile(
@@ -218,7 +272,7 @@ class NavBar extends StatelessWidget {
             title: const Text('New Calls'),
               onTap: () {
                 Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => newcall(mobileNumber: mobileNumber,),)
+                    MaterialPageRoute(builder: (context) => newcall(mobileNumber: widget.mobileNumber,),)
                 );
               }
           ),
@@ -234,7 +288,7 @@ class NavBar extends StatelessWidget {
                 onTap: () {
 
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => DisplayAcceptedCall(mobileNumber: mobileNumber,),)
+                      MaterialPageRoute(builder: (context) => DisplayAcceptedCall(mobileNumber: widget.mobileNumber,),)
                   );
                   // Handle Accepted Calls sub-menu item click
                   // Navigator.of(context).pop(); // Close the drawer if needed
@@ -246,7 +300,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('In-Process Calls'),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => InProcessCalls(mobileNumber: mobileNumber,),)
+                      MaterialPageRoute(builder: (context) => InProcessCalls(mobileNumber: widget.mobileNumber,),)
                   );
                 },
               ),
@@ -255,7 +309,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('Hold Calls'),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => HoldCalls(mobileNumber: mobileNumber,),)
+                      MaterialPageRoute(builder: (context) => HoldCalls(mobileNumber: widget.mobileNumber,),)
                   );
                 },
               ),
@@ -264,7 +318,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('Completed Calls'),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => CompletedCalls(mobileNumber: mobileNumber,),)
+                      MaterialPageRoute(builder: (context) => CompletedCalls(mobileNumber: widget.mobileNumber,),)
                   );
                 },
               ),
@@ -273,7 +327,7 @@ class NavBar extends StatelessWidget {
                 title: const Text('InCompleted Calls'),
                 onTap: () {
                   Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => InCompleteCalls(mobileNumber: mobileNumber,),)
+                      MaterialPageRoute(builder: (context) => InCompleteCalls(mobileNumber: widget.mobileNumber,),)
                   );
                 },
               )
