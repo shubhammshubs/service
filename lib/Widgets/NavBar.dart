@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:service/CallS/Call_History.dart';
 import 'package:service/CallS/Completed_Calls.dart';
 import 'package:service/user_credientials/info_form.dart';
 import 'package:service/user_credientials/info_form_2_register.dart';
@@ -337,6 +338,9 @@ class _NavBarState extends State<NavBar> {
             leading: const Icon(Icons.contact_phone_outlined),
             title: const Text("Call History"),
             onTap: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => CallHistory(mobileNumber: widget.mobileNumber,),)
+              );
 
             },
           ),

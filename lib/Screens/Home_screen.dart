@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
+import 'package:service/CallS/Call_History.dart';
 
 import '../CallS/Accepted_Calls.dart';
 import '../CallS/Completed_Calls.dart';
@@ -10,7 +11,7 @@ import '../CallS/Hold_Calls.dart';
 import '../CallS/InProcess_Calls.dart';
 import '../CallS/Incomplete_Calls.dart';
 import '../Widgets/NavBar.dart';
-import '../Widgets/data_provider.dart';
+import '../API/data_provider.dart';
 import '../draftTest.dart';
 class HomePage extends StatefulWidget {
   final String mobileNumber;
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   int itemCountInProcess = 0;
   int itemCountIncomplete = 0;
   int itemCountAccepted = 0;
+  int itemCountCallHistory = 0;
 
 
   @override
@@ -40,6 +42,7 @@ class _HomePageState extends State<HomePage> {
     _fetchInprocessCallsCount(widget.mobileNumber);
     _fetchIncompleteCallsCount(widget.mobileNumber);
     _fetchAcceptedCallsCount(widget.mobileNumber);
+    _fetchCallHistoryCount(widget.mobileNumber);
   }
 
 
@@ -51,6 +54,14 @@ class _HomePageState extends State<HomePage> {
       });
     });
   }
+  void _fetchCallHistoryCount(String mobileNumber) {
+    fetchCallHistoryCount(mobileNumber).then((count) {
+      setState(() {
+        itemCountCallHistory = count;
+      });
+    });
+  }
+
 
   void _fetchHoldCallsCount(String mobileNumber) {
     fetchHoldCallsCount(mobileNumber).then((count) {
@@ -90,6 +101,8 @@ class _HomePageState extends State<HomePage> {
     final itemCountInProcess = await fetchInprocessCallsCount(widget.mobileNumber);
     final itemCountIncomplete = await fetchIncompleteCallsCount(widget.mobileNumber);
     // final itemCountAccepted = await fetchAcceptedCallsCount(widget.mobileNumber);
+    final itemCountCallHistory = await fetchCallHistoryCount(widget.mobileNumber);
+
 
     setState(() {
       this.itemCount = itemCount;
@@ -97,6 +110,8 @@ class _HomePageState extends State<HomePage> {
       this.itemCountInProcess = itemCountInProcess;
       this.itemCountIncomplete = itemCountIncomplete;
       // this.itemCountAccepted = itemCountAccepted;
+      this.itemCountCallHistory = itemCountCallHistory;
+
     });
   }
 
@@ -149,33 +164,73 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Adjust spacing as needed
                   children: [
                     // Button 1
-                    Container(
-                      width: 150, // Fixed width for all buttons
-                      child: MaterialButton(
-                        height: 50,
-                        onPressed: () async {
-                          // Implement button 1 logic
-                        },
-                        color: Colors.lightBlueAccent,
-                        textColor: Colors.black,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(
-                              Icons.call, // Choose the icon you want
-                              size: 24, // Adjust the size as needed
+                    // Container(
+                    //   width: 150, // Fixed width for all buttons
+                    //   child: MaterialButton(
+                    //     height: 50,
+                    //     onPressed: () async {
+                    //       // Implement button 1 logic
+                    //     },
+                    //     color: Colors.lightBlueAccent,
+                    //     textColor: Colors.black,
+                    //     child: const Row(
+                    //       mainAxisAlignment: MainAxisAlignment.center,
+                    //       children: <Widget>[
+                    //         Icon(
+                    //           Icons.call, // Choose the icon you want
+                    //           size: 24, // Adjust the size as needed
+                    //         ),
+                    //         SizedBox(width: 8), // Add some spacing between the icon and text
+                    //         Text(
+                    //           'Total Calls',
+                    //           style: TextStyle(
+                    //             fontSize: 16,
+                    //             fontWeight: FontWeight.bold,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Adjust spacing as needed
+                      children: [
+                        // Button 3
+                        Container(
+                          width: 150, // Fixed width for all buttons
+                          child: MaterialButton(
+                            height: 50,
+                            onPressed: () async {
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) =>
+                                      CallHistory(mobileNumber: widget.mobileNumber,))
+                              );
+                            },
+                            color: Colors.lightBlueAccent,
+                            textColor: Colors.black,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center, // Center the children vertically
+                              children: [
+                                const Text(
+                                  'Total Calls',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  ' ($itemCountCallHistory)',
+                                  style: const TextStyle(
+                                    fontSize: 14, // Adjust the size as needed
+                                  ),
+                                ),
+                              ],
                             ),
-                            SizedBox(width: 8), // Add some spacing between the icon and text
-                            Text(
-                              'Total Calls',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
+                        // Button 4
+
+                      ],
                     ),
                     // Button 2
                     Container(

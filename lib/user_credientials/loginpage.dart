@@ -8,6 +8,8 @@ import 'package:service/user_credientials/register_1.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Screens/Home_screen.dart';
+import 'ForgotPassMobileVerify.dart';
+import 'forgot_password.dart';
 
 
 class LoginPage extends StatefulWidget {
@@ -242,7 +244,35 @@ class _LoginPageState extends State<LoginPage> {
                           },
                         ),
                       ),
+                      fogetpassword(context),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.end,
+                      //   children: [
+                      //
+                      //     GestureDetector(
+                      //       onTap: () {
+                      //         Navigator.of(context).push(
+                      //           MaterialPageRoute(
+                      //             builder: (context) =>
+                      //                 ForgotPassMobVerify(),
+                      //           ),
+                      //         );
+                      //       },
+                      //       child: Text(
+                      //         'Forgot Password',
+                      //         style: TextStyle(
+                      //           fontSize: 16,
+                      //           fontWeight: FontWeight.w500,
+                      //           color: Colors.redAccent[100],
+                      //           decoration: TextDecoration.underline,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     SizedBox(width: 20,)
+                      //   ],
+                      // ),
                       SizedBox(height: 30),
+
 
                       // Code for Login Button
 
@@ -301,7 +331,11 @@ class _LoginPageState extends State<LoginPage> {
                             decoration: TextDecoration.underline,
                           ),
                         ),
-                      )
+                      ),
+                      SizedBox(height: 20),
+
+
+
                     ],
                   ),
                 ),
@@ -309,6 +343,31 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget fogetpassword(BuildContext context) {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: 35,
+      alignment: Alignment.bottomRight ,
+      child: TextButton(
+        child: Text(
+          "Forgot Password?",
+          style: TextStyle(color: Colors.red),
+          textAlign: TextAlign.right,
+
+        ),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (context) =>
+                // ForgetPass(),
+                ForgotPassMobVerify(),
+              ),
+          );
+
+        },
       ),
     );
   }

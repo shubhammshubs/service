@@ -35,7 +35,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   late TextEditingController _mobileController; // Declare _mobileController
 
   String? selectedGender;
-  List<String> genderOptions = ['Male', 'Female', 'Other'];
+  List<String> genderOptions = ['Male', 'Female'];
 
   @override
   void initState() {

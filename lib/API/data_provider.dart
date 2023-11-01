@@ -15,6 +15,19 @@ Future<int> fetchCompletedCallsCount(String mobileNumber) async {
   }
 }
 
+Future<int> fetchCallHistoryCount(String mobileNumber) async {
+  final response = await http.post(
+    Uri.parse("https://apip.trifrnd.com/Services/eng/sereng.php?apicall=readallcalls"),
+    body: {"AcceptedBy": mobileNumber},
+  );
+
+  if (response.statusCode == 200) {
+    final List<Map<String, dynamic>> dataList = List<Map<String, dynamic>>.from(json.decode(response.body));
+    return dataList.length;
+  } else {
+    throw Exception('Failed to load data');
+  }
+}
 
 
 

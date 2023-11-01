@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 
 import '../API/Display_Image.dart';
 import '../API/Personal_Information_APi.dart';
@@ -28,6 +29,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   UserRegisterInfo? userRegisterInfo;
   String email = '';
 
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +50,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
 
+
   void fetchUserProfile() async {
     try {
       UserProfile? user = await apiProvider.fetchUserProfile(widget.mobileNumber);
@@ -62,20 +65,42 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // if (userProfile == null) {
+    //   return const Scaffold(
+    //
+    //     body: Center(
+    //       child: Text(
+    //         'No Data Found',
+    //         style: TextStyle(
+    //           fontSize: 20,
+    //           color: Colors.black,
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // }
+
     return Scaffold(
       appBar: AppBar(
       backgroundColor: Colors.teal,
       centerTitle: true,
-      title: Text(
+      title: const Text(
         'Services',
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
     ),
       body: Center(
         child: userProfile == null
-            ? CircularProgressIndicator()
+            ? const Text(
+          'No Data Found',
+          style: TextStyle(
+            fontSize: 20,
+            color: Colors.black,
+          ),
+        )
             : UserProfileWidget(userProfile: userProfile!, mobileNumber: widget.mobileNumber,
-          email: email, // Pass the email parameter
+          email: email,
+          // userProfileRegistered: userProfileRegistered!, // Pass the email parameter
         ),
 
       ),
@@ -86,6 +111,7 @@ class UserProfileWidget extends StatelessWidget {
   final UserProfile userProfile;
   final String mobileNumber;
   final String email; // Add the email parameter
+  // final UserProfileRegistered userProfileRegistered;
 
   // final UserRegisterInfo userRegisterInfo;
   double screenHeight = 0;
@@ -96,8 +122,16 @@ class UserProfileWidget extends StatelessWidget {
     required this.email, // Add the email parameter
 
     required this.mobileNumber,
+    // required this.userProfileRegistered,
     // required this.userRegisterInfo
   });
+
+  void _updateProfilePageData() async {
+  await fetchImageUrl(mobileNumber);
+  await userProfile;
+  await email;
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,272 +140,560 @@ class UserProfileWidget extends StatelessWidget {
     return Scaffold(
 
       body: Scaffold(
-        body: SingleChildScrollView(
+        body: LiquidPullToRefresh(
+          color: Colors.teal,
+          springAnimationDurationInMilliseconds: 200,
+          onRefresh: () async {
+            // Implement your refresh logic here
+            await Future.delayed(const Duration(seconds: 1)); // Simulate a delay
+            _updateProfilePageData(); // Fetch your data again
+            print('Refreshing...'); // Add this line
+
+          },
+          showChildOpacityTransition: false,
+          child: SingleChildScrollView(
 
 
-          child: Center(
-            child: userProfile == null
-                ? const CircularProgressIndicator()
-                : Column(
-              children: [
-                const SizedBox(
-                  height: 16.0, // Add some spacing
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      CircularImage(mobileNumber: mobileNumber,),
-                      const SizedBox(height: 12,),
-                      Text(
-                        '${userProfile.fName} ${userProfile.mName ?? ""} ${userProfile.lName}', // Replace with the desired name
-                        style: const TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12,),
-                       Text(
-                         'Email: $email',
-                             // '?? "N/A"',
-                         // Replace with the desired name
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 12,),
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Divider(
-                          color: Colors.black,
-                          thickness: 1.5,
-                        ),
-                      ),
-
-                      // SizedBox(height: 2,),
-                      Text(
-                        'Personal Information',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.teal.shade300,
-                            fontWeight: FontWeight.bold
-                        ),
-                      ),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black,
-                                width: 1.0,
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Row(
-                                children: <Widget>[
-                                  const Icon(Icons.date_range,
-                                    color: Colors.teal,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    '${userProfile.dob ?? "N/A"}',
-                                    style: const TextStyle(
-                                      fontSize: 13.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+            child: Center(
+              child: userProfile == null
+                  ? const CircularProgressIndicator()
+                  : Column(
+                children: [
+                  const SizedBox(
+                    height: 16.0, // Add some spacing
+                  ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: Column(
+                      children: [
+                        CircularImage(mobileNumber: mobileNumber,),
+                        const SizedBox(height: 12,),
+                        Text(
+                          '${userProfile.fName} ${userProfile.mName ?? ""} ${userProfile.lName}', // Replace with the desired name
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black, // Border color
-                                width: 1.0, // Border width
+                        ),
+                        // Text(
+                        //   '${userProfileRegistered.Last_Edu} ${userProfileRegistered.Last_Edu_Year ?? ""} ${userProfile.lName}', // Replace with the desired name
+                        //   style: const TextStyle(
+                        //     fontSize: 16.0,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
+                        const SizedBox(height: 12,),
+                         Text(
+                           'Email: $email',
+                               // '?? "N/A"',
+                           // Replace with the desired name
+                          style: const TextStyle(
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12,),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 18.0),
+                          child: Divider(
+                            color: Colors.black,
+                            thickness: 1.5,
+                          ),
+                        ),
+
+                        // SizedBox(height: 2,),
+                        Text(
+                          'Personal Information',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.teal.shade300,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0),
-                              child:
-                              Row(
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
                                   children: <Widget>[
-                                    const Icon(Icons.home,
+                                    const Icon(Icons.date_range,
                                       color: Colors.teal,
                                     ),
-                                    const SizedBox(width: 8),Text(
-                                      '${userProfile.address}',
-                                      style: const TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ]
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black, // Border color
-                                width: 1.0, // Border width
-                              ),
-                              borderRadius: BorderRadius.circular(20), // Border radius
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0), // Padding within the border
-                              child: Row(
-                                  children: <Widget>[
-                                    const Icon(FontAwesomeIcons.mapLocationDot, // Icon you want to use
-                                      color: Colors.teal, // Icon color
-                                    ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      '${userProfile.district}',
+                                      '${userProfile.dob ?? "N/A"}',
                                       style: const TextStyle(
                                         fontSize: 13.0,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ]
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black, // Border color
-                                width: 1.0, // Border width
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              borderRadius: BorderRadius.circular(20), // Border radius
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0), // Padding within the border
-                              child: Row(
-                                  children: <Widget>[
-                                    const Icon(Icons.location_pin, // Icon you want to use
-                                      color: Colors.teal, // Icon color
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '${userProfile.city}',
-                                      style: const TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child:
+                                Row(
+                                    children: <Widget>[
+                                      const Icon(Icons.home,
+                                        color: Colors.teal,
                                       ),
-                                    ),
-                                  ]
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black, // Border color
-                                width: 1.0, // Border width
-                              ),
-                              borderRadius: BorderRadius.circular(20), // Border radius
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0), // Padding within the border
-                              child: Row(
-                                  children: <Widget>[
-                                    const Icon(Icons.location_city, // Icon you want to use
-                                      color: Colors.teal, // Icon color
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '${userProfile.pincode}',
-                                      style: const TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
+                                      const SizedBox(width: 8),Text(
+                                        '${userProfile.address}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                  ]
+                                    ]
+                                ),
                               ),
                             ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.only(top: 20),
-                            width: 170,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.black, // Border color
-                                width: 1.0, // Border width
-                              ),
-                              borderRadius: BorderRadius.circular(20), // Border radius
-                            ),
-                            child: Container(
-                              padding: const EdgeInsets.all(16.0), // Padding within the border
-                              child: Row(
-                                  children: <Widget>[
-                                    const Icon(FontAwesomeIcons.mapPin, // Icon you want to use
-                                      color: Colors.teal, // Icon color
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '${userProfile.state}',
-                                      style: const TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ]
-                              ),
-                            ),
-                          ),
-                        ],
-
-                      ),
-                      const SizedBox(height: 12,),
-
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Divider(
-                          color: Colors.black,
-                          thickness: 1.5,
+                          ],
                         ),
-                      ),
-
-                      // SizedBox(height: 2,),
-                      Text(
-                        'Registered Information',
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.teal.shade300,
-                            fontWeight: FontWeight.bold
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20), // Border radius
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0), // Padding within the border
+                                child: Row(
+                                    children: <Widget>[
+                                      const Icon(FontAwesomeIcons.mapLocationDot, // Icon you want to use
+                                        color: Colors.teal, // Icon color
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${userProfile.district}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20), // Border radius
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0), // Padding within the border
+                                child: Row(
+                                    children: <Widget>[
+                                      const Icon(Icons.location_pin, // Icon you want to use
+                                        color: Colors.teal, // Icon color
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${userProfile.city}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20), // Border radius
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0), // Padding within the border
+                                child: Row(
+                                    children: <Widget>[
+                                      const Icon(Icons.location_city, // Icon you want to use
+                                        color: Colors.teal, // Icon color
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${userProfile.pincode}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20), // Border radius
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0), // Padding within the border
+                                child: Row(
+                                    children: <Widget>[
+                                      const Icon(FontAwesomeIcons.mapPin, // Icon you want to use
+                                        color: Colors.teal, // Icon color
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '${userProfile.state}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                          ],
+
+                        ),
+                        const SizedBox(height: 12,),
+
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 18.0),
+                          child: Divider(
+                            color: Colors.black,
+                            thickness: 1.5,
+                          ),
+                        ),
+
+                        // SizedBox(height: 2,),
+                        Text(
+                          'Registered Information',
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.teal.shade300,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.school,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${userProfile.Last_Edu ?? "N/A"}',
+                                      style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child:
+                                Row(
+                                    children: <Widget>[
+                                      const Icon(FontAwesomeIcons.calendarCheck,
+                                        color: Colors.teal,
+                                      ),
+                                      const SizedBox(width: 8),Text(
+                                        '${userProfile.Last_Edu_Year}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Reg Info row 2
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.credit_card,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${userProfile.PAN_No ?? "N/A"}',
+                                      style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child:
+                                Row(
+                                    children: <Widget>[
+                                      const Icon(FontAwesomeIcons.solidAddressCard,
+                                        color: Colors.teal,
+                                      ),
+                                      const SizedBox(width: 8),Text(
+                                        '${userProfile.Aadhar_No}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Reg Info row 3
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(FontAwesomeIcons.briefcase,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${userProfile.Work_Exp ?? "N/A"}',
+                                      style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black, // Border color
+                                  width: 1.0, // Border width
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child:
+                                Row(
+                                    children: <Widget>[
+                                      const Icon(FontAwesomeIcons.buildingColumns,
+                                        color: Colors.teal,
+                                      ),
+                                      const SizedBox(width: 8),Text(
+                                        '${userProfile.Bank_Name}',
+                                        style: const TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ]
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Reg Info row 4
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 20),
+                              width: 170,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.black,
+                                  width: 1.0,
+                                ),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  children: <Widget>[
+                                    const Icon(Icons.share_location_outlined,
+                                      color: Colors.teal,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '${userProfile.Bank_IFSC ?? "N/A"}',
+                                      style: const TextStyle(
+                                        fontSize: 13.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            // Empty 2nd entry of last row
+                            // Container(
+                            //   margin: const EdgeInsets.only(top: 20),
+                            //   width: 170,
+                            //   decoration: BoxDecoration(
+                            //     border: Border.all(
+                            //       color: Colors.black, // Border color
+                            //       width: 1.0, // Border width
+                            //     ),
+                            //     borderRadius: BorderRadius.circular(20),
+                            //   ),
+                            //   child: Container(
+                            //     padding: const EdgeInsets.all(16.0),
+                            //     child:
+                            //     Row(
+                            //         children: <Widget>[
+                            //           const Icon(Icons.home,
+                            //             color: Colors.teal,
+                            //           ),
+                            //           const SizedBox(width: 8),Text(
+                            //             '${userProfile.Bank_Name}',
+                            //             style: const TextStyle(
+                            //               fontSize: 13.0,
+                            //               fontWeight: FontWeight.bold,
+                            //             ),
+                            //           ),
+                            //         ]
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                        const SizedBox(height: 12,),
+
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 18.0),
+                          child: Divider(
+                            color: Colors.black,
+                            thickness: 1.5,
+                          ),
+                        ),
+
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -437,7 +759,7 @@ class _CircularImageState extends State<CircularImage> {
                   bottom: 170,// Adjust the top position of the close button
                   right: 50.0, // Adjust the right position of the close button
                   child: IconButton(
-                    icon: Icon(Icons.close,
+                    icon: const Icon(Icons.close,
                       color: Colors.white,),
                     onPressed: () {
                       Navigator.of(context).pop(); // Close the dialog
@@ -456,7 +778,7 @@ class _CircularImageState extends State<CircularImage> {
             backgroundColor: Colors.white,
             backgroundImage: NetworkImage(imageUrl!), // Use NetworkImage to load an image from a URL
           )
-              : Text("Image not found"),
+              : const Text("Image not found"),
     ),
       );
   }

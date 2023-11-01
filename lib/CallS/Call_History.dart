@@ -6,16 +6,16 @@ import 'package:provider/provider.dart';
 import '../Widgets/NavBar.dart';
 import '../API/data_provider.dart';
 
-class CompletedCalls extends StatefulWidget {
+class CallHistory extends StatefulWidget {
   final String mobileNumber;
 
-  CompletedCalls({required this.mobileNumber});
+  CallHistory({required this.mobileNumber});
 
   @override
-  _CompletedCallsState createState() => _CompletedCallsState();
+  _CallHistoryState createState() => _CallHistoryState();
 }
 
-class _CompletedCallsState extends State<CompletedCalls> {
+class _CallHistoryState extends State<CallHistory> {
   List<Map<String, dynamic>> apiDataList = [];
   double screenHeight = 0;
   double screenWidth = 0;
@@ -28,7 +28,7 @@ class _CompletedCallsState extends State<CompletedCalls> {
 
   void fetchData() async {
     final response = await http.post(
-      Uri.parse("https://apip.trifrnd.com/Services/eng/sereng.php?apicall=readCompleted"),
+      Uri.parse("https://apip.trifrnd.com/Services/eng/sereng.php?apicall=readallcalls"),
       body: {"AcceptedBy": widget.mobileNumber},
     );
 
@@ -130,11 +130,31 @@ class _CompletedCallsState extends State<CompletedCalls> {
                     ),
                   ),
                   const SizedBox(height: 10,),
-
+                  // RichText(
+                  //   text: TextSpan(
+                  //     text: "Call Status: ",
+                  //     style: const TextStyle(
+                  //       fontWeight: FontWeight.bold, // Make it bold
+                  //       color: Colors.black,
+                  //       // fontSize: screenWidth / 18,
+                  //
+                  //     ),
+                  //     children: <TextSpan>[
+                  //       TextSpan(
+                  //         text: item['status'],
+                  //         style: const TextStyle(
+                  //           fontWeight: FontWeight.normal, // Reset to normal font weight
+                  //           color: Colors.black,
+                  //           // fontSize: screenWidth / 18,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
 
                   // Text("Client Name: ${item['Client_Name']}"),
 
-                  const SizedBox(height: 10,),
+                  // const SizedBox(height: 10,),
 
                   // Text("category: ${item['category']}"),
                   RichText(
@@ -377,12 +397,41 @@ class _CompletedCallsState extends State<CompletedCalls> {
             ),
           ),
           actions: <Widget>[
-            TextButton(
-              child: const Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                RichText(
+                text: TextSpan(
+                  text: "Call Status: ",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, // Make it bold
+                    color: Colors.black,
+                      fontSize: screenWidth / 24,
+                    // fontSize: screenWidth / 18,
+
+                  ),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: item['status'],
+                      style: const TextStyle(
+                        fontWeight: FontWeight.normal, // Reset to normal font weight
+                        color: Colors.black,
+                        // fontSize: screenWidth / 18,
+                      ),
+                    ),
+                  ],
+                ),
+          ),
+                TextButton(
+                  child: const Text('Close'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
+
+
           ],
         );
       },
@@ -400,7 +449,7 @@ class _CompletedCallsState extends State<CompletedCalls> {
         backgroundColor: Colors.teal,
         centerTitle: true,
         title: const Text(
-          'Completed Calls',
+          'Call History',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
       ),
@@ -415,7 +464,7 @@ class _CompletedCallsState extends State<CompletedCalls> {
                     SizedBox(height: 250,),
                     Center(
                       child: Text(
-                        'No Completed Calls.',
+                        'No Calls Found.',
                         style: TextStyle(
                           fontSize: 16,
                           color: Colors.black26,
